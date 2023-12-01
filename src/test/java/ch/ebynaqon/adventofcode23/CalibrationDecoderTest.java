@@ -34,6 +34,28 @@ class CalibrationDecoderTest {
         assertThat(decoded).isEqualTo(decodedValue);
     }
 
+    public static Stream<Arguments> decodingExamplesWithWrittenNumbers() {
+        return Stream.of(
+                Arguments.of("two1nine", 29),
+                Arguments.of("eightwothree", 83),
+                Arguments.of("abcone2threexyz", 13),
+                Arguments.of("xtwone3four", 24),
+                Arguments.of("4nineeightseven2", 42),
+                Arguments.of("zoneight234", 14),
+                Arguments.of("7pqrstsixteen", 76)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("decodingExamples")
+    void decodeValuesWithWrittenNumbers(String encodedText, int decodedValue) {
+        var encoded = new EncodedCalibrationValue(encodedText);
+
+        var decoded = encoded.decodeWithWrittenNumbers();
+
+        assertThat(decoded).isEqualTo(decodedValue);
+    }
+
     @Test
     void solvePuzzle1() throws URISyntaxException, IOException {
         var inputs = Files.readAllLines(Path.of(getClass().getResource("/day1-encoded-calibration-values.txt").toURI()));
@@ -43,5 +65,16 @@ class CalibrationDecoderTest {
                 .sum();
 
         assertThat(result).isEqualTo(54697);
+    }
+
+    @Test
+    void solvePuzzle2() throws URISyntaxException, IOException {
+        var inputs = Files.readAllLines(Path.of(getClass().getResource("/day1-encoded-calibration-values.txt").toURI()));
+
+        var result = inputs.stream().map(EncodedCalibrationValue::new)
+                .mapToInt(EncodedCalibrationValue::decodeWithWrittenNumbers)
+                .sum();
+
+        assertThat(result).isEqualTo(54885);
     }
 }

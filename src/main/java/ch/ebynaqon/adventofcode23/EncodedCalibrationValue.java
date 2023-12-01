@@ -1,28 +1,64 @@
 package ch.ebynaqon.adventofcode23;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.OptionalInt;
+import java.util.List;
 import java.util.stream.Stream;
 
 public record EncodedCalibrationValue(String encodedText) {
 
     public static final int ZERO = Character.valueOf('0').charValue();
+    public static final List<Mapping> WRITTEN_NUMBERS = List.of(
+            new Mapping("one", 1),
+            new Mapping("two", 2),
+            new Mapping("three", 3),
+            new Mapping("four", 4),
+            new Mapping("five", 5),
+            new Mapping("six", 6),
+            new Mapping("seven", 7),
+            new Mapping("eight", 8),
+            new Mapping("nine", 9)
+    );
+    public static final List<Mapping> NUMERIC_NUMBERS = List.of(
+            new Mapping("0", 0),
+            new Mapping("1", 1),
+            new Mapping("2", 2),
+            new Mapping("3", 3),
+            new Mapping("4", 4),
+            new Mapping("5", 5),
+            new Mapping("6", 6),
+            new Mapping("7", 7),
+            new Mapping("8", 8),
+            new Mapping("9", 9)
+    );
+    public static final List<Mapping> WRITTEN_AND_NUMERIC_NUMBERS = Stream.concat(NUMERIC_NUMBERS.stream(), WRITTEN_NUMBERS.stream()).toList();
 
     public int decode() {
-        char[] chars = encodedText.toCharArray();
-        Integer firstNumber = null;
-        Integer lastNumber = null;
-        for (int i = 0; i < chars.length && firstNumber == null; i++) {
-            if (Character.isDigit(chars[i])) {
-                firstNumber = ((int) chars[i]) - ZERO;
+        return extracted(NUMERIC_NUMBERS);
+    }
+
+    public int decodeWithWrittenNumbers() {
+        return extracted(WRITTEN_AND_NUMERIC_NUMBERS);
+    }
+
+    private int extracted(List<Mapping> numericNumbers) {
+        int firstPosition = encodedText.length() + 1;
+        int lastPosition = -1;
+        Integer first = null;
+        Integer last = null;
+        for (var mapping : numericNumbers) {
+            int pos = encodedText.indexOf(mapping.text());
+            if (pos > -1 && pos < firstPosition) {
+                firstPosition = pos;
+                first = mapping.value();
+            }
+            pos = encodedText.lastIndexOf(mapping.text());
+            if (pos > -1 && pos > lastPosition) {
+                lastPosition = pos;
+                last = mapping.value();
             }
         }
-        for (int i = chars.length - 1; i >= 0 && lastNumber == null; i--) {
-            if (Character.isDigit(chars[i])) {
-                lastNumber = (int) chars[i] - ZERO;
-            }
-        }
-        return firstNumber * 10 + lastNumber;
+        return first * 10 + last;
+    }
+
+    public record Mapping(String text, Integer value) {
     }
 }
