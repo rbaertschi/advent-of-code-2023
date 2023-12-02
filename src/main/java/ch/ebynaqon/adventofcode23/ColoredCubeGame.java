@@ -14,12 +14,13 @@ public class ColoredCubeGame {
                 .toList();
         return new Game(gameId, draws);
     }
+
     private static Draw parseDraw(String drawText) {
         String[] colorsDraws = drawText.split(",");
         int red = 0;
         int green = 0;
         int blue = 0;
-        for (var colorDraw:colorsDraws         ) {
+        for (var colorDraw : colorsDraws) {
             String[] countAndColor = colorDraw.trim().split(" ");
             int count = Integer.parseInt(countAndColor[0]);
             if ("red".equals(countAndColor[1])) red = count;
@@ -32,8 +33,15 @@ public class ColoredCubeGame {
     public static int sumUpValidGameIds(List<String> lines) {
         return lines.stream()
                 .map(ColoredCubeGame::parseLine)
-                .filter(game -> game.hasValidDrawsFor(12,13,14))
+                .filter(game -> game.hasValidDrawsFor(12, 13, 14))
                 .mapToInt(Game::id)
+                .sum();
+    }
+
+    public static int sumUpPowerOfMinimalDraws(List<String> lines) {
+        return lines.stream()
+                .map(ColoredCubeGame::parseLine)
+                .mapToInt(Game::minimalDrawPower)
                 .sum();
     }
 
@@ -43,6 +51,20 @@ public class ColoredCubeGame {
                     draw.red() <= maxRed && draw.green() <= maxGreen && draw.blue() <= maxBlue
             );
         }
+
+        public int minimalDrawPower() {
+            int red = 0;
+            int green = 0;
+            int blue = 0;
+            for (var draw : draws) {
+                red = Math.max(red, draw.red);
+                green = Math.max(green, draw.green);
+                blue = Math.max(blue, draw.blue);
+            }
+            return red * green * blue;
+        }
     }
-    public record Draw(int red, int green, int blue) {}
+
+    public record Draw(int red, int green, int blue) {
+    }
 }
