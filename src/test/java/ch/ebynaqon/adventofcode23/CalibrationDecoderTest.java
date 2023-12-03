@@ -7,8 +7,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,7 +56,7 @@ class CalibrationDecoderTest {
 
     @Test
     void solvePuzzle1() throws URISyntaxException, IOException {
-        var inputs = Files.readAllLines(Path.of(getClass().getResource("/day1-encoded-calibration-values.txt").toURI()));
+        var inputs = TestHelper.readInputLines("/day1-encoded-calibration-values.txt");
 
         var result = inputs.stream().map(EncodedCalibrationValue::new)
                 .mapToInt(EncodedCalibrationValue::decode)
@@ -69,7 +67,7 @@ class CalibrationDecoderTest {
 
     @Test
     void solvePuzzle2() throws URISyntaxException, IOException {
-        var inputs = Files.readAllLines(Path.of(getClass().getResource("/day1-encoded-calibration-values.txt").toURI()));
+        var inputs = TestHelper.readInputLines("/day1-encoded-calibration-values.txt");
 
         var result = inputs.stream().map(EncodedCalibrationValue::new)
                 .mapToInt(EncodedCalibrationValue::decodeWithWrittenNumbers)
@@ -77,4 +75,5 @@ class CalibrationDecoderTest {
 
         assertThat(result).isEqualTo(54885);
     }
+
 }

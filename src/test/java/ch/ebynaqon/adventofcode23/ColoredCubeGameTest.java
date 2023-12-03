@@ -71,7 +71,7 @@ public class ColoredCubeGameTest {
 
     @Test
     void calculateSumOfPowerOfMinimumDrawsForStep2() throws URISyntaxException, IOException {
-        var inputs = Files.readAllLines(Path.of(getClass().getResource("/day2-games-with-draws.txt").toURI()));
+        var inputs = TestHelper.readInputLines("/day2-games-with-draws.txt");
 
         var actual = sumUpPowerOfMinimalDraws(inputs);
 
