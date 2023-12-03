@@ -2,11 +2,13 @@ package ch.ebynaqon.adventofcode23;
 
 import ch.ebynaqon.adventofcode23.SchemaDecoder.Line;
 import ch.ebynaqon.adventofcode23.SchemaDecoder.Number;
+import ch.ebynaqon.adventofcode23.SchemaDecoder.Symbol;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,6 +24,7 @@ class SchemaDecoderTest {
                 new Number(114, 5, 7)
         ), List.of()));
     }
+
     @Test
     void lineWithNumberAndSymbol() {
         var line = "617*......";
@@ -30,7 +33,7 @@ class SchemaDecoderTest {
 
         assertThat(actual).isEqualTo(new Line(List.of(
                 new Number(617, 0, 2)
-        ), List.of(3)));
+        ), List.of(new Symbol(3, "*", Set.of()))));
     }
 
     @Test
@@ -51,6 +54,26 @@ class SchemaDecoderTest {
         var actual = new SchemaDecoder(input).findPartNumbers();
 
         assertThat(actual).isEqualTo(List.of(467, 35, 633, 617, 592, 755, 664, 598));
+    }
+
+    @Test
+    void findGearRatio() {
+        var input = """
+                467..114..
+                ...*......
+                ..35..633.
+                ......#...
+                617*......
+                .....+.58.
+                ..592.....
+                ......755.
+                ...$.*....
+                .664.598..
+                """.trim();
+
+        var actual = new SchemaDecoder(input).sumOfGearRatios();
+
+        assertThat(actual).isEqualTo(467835);
     }
 
     @Test
@@ -80,5 +103,14 @@ class SchemaDecoderTest {
         var actual = new SchemaDecoder(input).sumOfPartNumbers();
 
         assertThat(actual).isEqualTo(529618);
+    }
+
+    @Test
+    void sumOfGearRatiosForPuzzleInputPart2() throws IOException, URISyntaxException {
+        var input = TestHelper.readInput("/day3-schematic-of-part-numbers.txt").trim();
+
+        var actual = new SchemaDecoder(input).sumOfGearRatios();
+
+        assertThat(actual).isEqualTo(77509019);
     }
 }

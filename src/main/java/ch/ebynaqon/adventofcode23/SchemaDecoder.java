@@ -1,8 +1,7 @@
 package ch.ebynaqon.adventofcode23;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class SchemaDecoder {
 
@@ -24,7 +23,7 @@ public class SchemaDecoder {
         String[] chars = line.split("");
         String numberBuffer = "";
         ArrayList<Number> numbers = new ArrayList<>();
-        ArrayList<Integer> symbolPositions = new ArrayList<>();
+        ArrayList<Symbol> symbols = new ArrayList<>();
         int curPos = 0;
         for (String cur : chars) {
             if (NUMBERS.contains(cur)) {
@@ -36,7 +35,7 @@ public class SchemaDecoder {
                 }
                 numberBuffer = "";
                 if (!cur.equals(".")) {
-                    symbolPositions.add(curPos);
+                    symbols.add(new Symbol(curPos, cur, new HashSet<>()));
                 }
             }
             curPos++;
@@ -45,7 +44,7 @@ public class SchemaDecoder {
             var newNumber = new Number(Integer.parseInt(numberBuffer), curPos - numberBuffer.length(), curPos - 1);
             numbers.add(newNumber);
         }
-        return new Line(numbers, symbolPositions);
+        return new Line(numbers, symbols);
     }
 
     public SchemaDecoder(String input) {
@@ -70,21 +69,30 @@ public class SchemaDecoder {
         return partNumbers.stream().map(Number::value).toList();
     }
 
+    public Integer sumOfGearRatios() {
+        findPartNumbers();
+        return Arrays.stream(lines).flatMap(line -> line.symbols().stream())
+                .filter(symbol -> symbol.adjacentNumbers().size() == 2)
+                .mapToInt(symbol -> symbol.adjacentNumbers().stream().mapToInt(Number::value).reduce(1, (acc, cur) -> acc * cur))
+                .sum();
+    }
+
     private boolean hasSymbolAdjacentTo(Number number, int curLine) {
+        ArrayList<Symbol> symbolsToCheck = new ArrayList<>(lines[curLine].symbols());
         if (curLine > 0) {
-            if (lines[curLine - 1].symbolPositions.stream().anyMatch(symbol -> isAdjacent(number, symbol))) {
-                return true;
-            }
-        }
-        if (lines[curLine].symbolPositions.stream().anyMatch(symbol -> isAdjacent(number, symbol))) {
-            return true;
+            symbolsToCheck.addAll(lines[curLine - 1].symbols());
         }
         if (curLine < lines.length - 1) {
-            if (lines[curLine + 1].symbolPositions.stream().anyMatch(symbol -> isAdjacent(number, symbol))) {
-                return true;
+            symbolsToCheck.addAll(lines[curLine + 1].symbols());
+        }
+        boolean hasAdjacentSymbol = false;
+        for (var symbol:symbolsToCheck         ) {
+            if (isAdjacent(number, symbol.position())) {
+                hasAdjacentSymbol = true;
+                symbol.adjacentNumbers().add(number);
             }
         }
-        return false;
+        return hasAdjacentSymbol;
     }
 
     private static boolean isAdjacent(Number number, Integer symbol) {
@@ -95,9 +103,12 @@ public class SchemaDecoder {
         return findPartNumbers().stream().mapToInt(i -> i).sum();
     }
 
-    public record Line(List<Number> numbers, List<Integer> symbolPositions) {
+    public record Line(List<Number> numbers, List<Symbol> symbols) {
     }
 
     public record Number(int value, int startPosition, int endPosition) {
+    }
+
+    public record Symbol(int position, String type, Set<Number> adjacentNumbers) {
     }
 }
