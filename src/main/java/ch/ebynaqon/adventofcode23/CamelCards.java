@@ -1,6 +1,8 @@
 package ch.ebynaqon.adventofcode23;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 public class CamelCards {
     public static List<Hand> parse(String input) {
@@ -10,24 +12,24 @@ public class CamelCards {
                 .toList();
     }
 
-    public static int solve(String input) {
+    public static long solve(String input) {
         List<Hand> hands = parse(input).stream().sorted(Comparator.comparing(Hand::score)).toList();
-        int sum = 0;
+        long sum = 0;
         for (int i = 0; i < hands.size(); i++) {
             sum += (i + 1) * hands.get(i).bet();
         }
         return sum;
     }
 
-    public record Hand(String cards, int bet) {
-        public static int ONE_PAIR = 0x100000;
-        public static int TWO_PAIRS = 0x200000;
-        public static int THREE_OF_A_KIND = 0x300000;
-        public static int FULL_HOUSE = 0x400000;
-        public static int FOUR_OF_A_KIND = 0x500000;
-        public static int FIVE_OF_A_KIND = 0x600000;
+    public record Hand(String cards, long bet) {
+        public static long ONE_PAIR = 0x100000;
+        public static long TWO_PAIRS = 0x200000;
+        public static long THREE_OF_A_KIND = 0x300000;
+        public static long FULL_HOUSE = 0x400000;
+        public static long FOUR_OF_A_KIND = 0x500000;
+        public static long FIVE_OF_A_KIND = 0x600000;
 
-        private static int[] POSITION_WEIGHT = {0x10000,0x1000,0x100,0x10,0x1};
+        private static long[] POSITION_WEIGHT = {0x10000, 0x1000, 0x100, 0x10, 0x1};
 
         /*
         6 - Five of a kind  - where all five cards have the same label: AAAAA
@@ -38,11 +40,11 @@ public class CamelCards {
         1 - One pair        - where two cards share one label, and the other three cards have a different label from the pair and each other: A23A4
         High card
         * */
-        public int score() {
+        public long score() {
             return scoreKind() + scoreCards();
         }
 
-        public int scoreKind() {
+        public long scoreKind() {
             var sortedCards = Arrays.stream((cards().split(""))).sorted().toList();
             var previousCard = "";
             var sameCardCount = 0;
@@ -50,8 +52,11 @@ public class CamelCards {
             var threeOfAKind = 0;
             var fourOfAKind = 0;
             var fiveOfAKind = 0;
-            for (var card: sortedCards             ) {
-                if (card.equals(previousCard)) {
+            var jokers = 0;
+            for (var card : sortedCards) {
+                if (card.equals("?")) {
+                    jokers++;
+                } else if (card.equals(previousCard)) {
                     sameCardCount++;
                 } else {
                     if (sameCardCount == 2) {
@@ -76,48 +81,65 @@ public class CamelCards {
             } else if (sameCardCount == 5) {
                 fiveOfAKind++;
             }
-            if (fiveOfAKind > 0) {
+            if (fiveOfAKind == 1) {
                 return FIVE_OF_A_KIND;
             }
-            if (fourOfAKind > 0) {
+            if (fourOfAKind == 1) {
+                if (jokers == 1) return FIVE_OF_A_KIND;
                 return FOUR_OF_A_KIND;
             }
-            if (threeOfAKind > 0) {
-                if (pairs > 0) {
+            if (threeOfAKind == 1) {
+                if (jokers == 2) return FIVE_OF_A_KIND;
+                if (jokers == 1) return FOUR_OF_A_KIND;
+                if (pairs == 1) {
                     return FULL_HOUSE;
                 } else {
                     return THREE_OF_A_KIND;
                 }
             }
-            if (pairs == 2) return TWO_PAIRS;
-            if (pairs == 1) return ONE_PAIR;
+            if (pairs == 2) {
+                if (jokers == 1) return FULL_HOUSE;
+                return TWO_PAIRS;
+            }
+            if (pairs == 1) {
+                if (jokers == 3) return FIVE_OF_A_KIND;
+                if (jokers == 2) return FOUR_OF_A_KIND;
+                if (jokers == 1) return THREE_OF_A_KIND;
+                return ONE_PAIR;
+            }
+            if (jokers == 5) return FIVE_OF_A_KIND;
+            if (jokers == 4) return FIVE_OF_A_KIND;
+            if (jokers == 3) return FOUR_OF_A_KIND;
+            if (jokers == 2) return THREE_OF_A_KIND;
+            if (jokers == 1) return ONE_PAIR;
             return 0;
         }
 
-        public int scoreCards() {
+        public long scoreCards() {
             String[] individualCards = cards().split("");
-            int sum = 0;
+            long sum = 0;
             for (int i = 0; i < individualCards.length; i++) {
                 sum += scoreCard(individualCards[i]) * POSITION_WEIGHT[i];
             }
             return sum;
         }
 
-        private int scoreCard(String card) {
+        private long scoreCard(String card) {
             return switch (card) {
-                case "A" -> 0xd;
-                case "K" -> 0xc;
-                case "Q" -> 0xb;
-                case "J" -> 0xa;
-                case "T" -> 0x9;
-                case "9" -> 0x8;
-                case "8" -> 0x7;
-                case "7" -> 0x6;
-                case "6" -> 0x5;
-                case "5" -> 0x4;
-                case "4" -> 0x3;
-                case "3" -> 0x2;
-                case "2" -> 0x1;
+                case "A" -> 0xe;
+                case "K" -> 0xd;
+                case "Q" -> 0xc;
+                case "J" -> 0xb;
+                case "T" -> 0xa;
+                case "9" -> 0x9;
+                case "8" -> 0x8;
+                case "7" -> 0x7;
+                case "6" -> 0x6;
+                case "5" -> 0x5;
+                case "4" -> 0x4;
+                case "3" -> 0x3;
+                case "2" -> 0x2;
+                case "?" -> 0x1;
                 default -> 0;
             };
         }
