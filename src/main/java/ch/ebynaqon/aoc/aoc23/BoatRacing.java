@@ -5,7 +5,7 @@ import java.util.List;
 
 // 7ms -> distance = (7x - x*x) 1mm
 // d(distance)=7-2x=0 -> 7 = 2x -> x = 7 / 2
-public class Day6 {
+public class BoatRacing {
     public static List<Race> parse(String input) {
         String[] lines = input.split("\n");
         String[] times = lines[0].split(":")[1].trim().split("\\s+");

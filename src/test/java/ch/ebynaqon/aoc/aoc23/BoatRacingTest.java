@@ -8,7 +8,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class Day6Test {
+class BoatRacingTest {
     @Test
     void parseInput() {
         var input = """
@@ -16,18 +16,18 @@ class Day6Test {
                 Distance:  9  40  200
                 """.trim();
 
-        var actual = Day6.parse(input);
+        var actual = BoatRacing.parse(input);
 
         assertThat(actual).isEqualTo(List.of(
-                new Day6.Race(7,9),
-                new Day6.Race(15,40),
-                new Day6.Race(30,200)
+                new BoatRacing.Race(7,9),
+                new BoatRacing.Race(15,40),
+                new BoatRacing.Race(30,200)
         ));
     }
 
     @Test
     void winningTimesForFirstExampleRace() {
-        var race = new Day6.Race(7, 9);
+        var race = new BoatRacing.Race(7, 9);
 
         var actual = race.winningTimes();
 
@@ -41,7 +41,7 @@ class Day6Test {
                 Distance:  9  40  200
                 """.trim();
 
-        var actual = Day6.solve(input);
+        var actual = BoatRacing.solve(input);
 
         assertThat(actual).isEqualTo(288);
     }
@@ -53,7 +53,7 @@ class Day6Test {
                 Distance:  940200
                 """.trim();
 
-        var actual = Day6.solve(input);
+        var actual = BoatRacing.solve(input);
 
         assertThat(actual).isEqualTo(71503);
     }
@@ -62,7 +62,7 @@ class Day6Test {
     void sloveForPuzzleInput() throws IOException, URISyntaxException {
         var input = TestHelper.readInput("/day6-input.txt").trim();
 
-        var actual = Day6.solve(input);
+        var actual = BoatRacing.solve(input);
 
         assertThat(actual).isEqualTo(1731600);
     }
@@ -71,7 +71,7 @@ class Day6Test {
     void sloveForPuzzleInput2() throws IOException, URISyntaxException {
         var input = TestHelper.readInput("/day6-input.txt").trim();
 
-        var actual = Day6.solveWithoutSpaces(input);
+        var actual = BoatRacing.solveWithoutSpaces(input);
 
         assertThat(actual).isEqualTo(40087680);
     }
