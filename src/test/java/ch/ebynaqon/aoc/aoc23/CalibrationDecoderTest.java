@@ -55,7 +55,7 @@ class CalibrationDecoderTest {
     }
 
     @Test
-    void solvePuzzle1() throws URISyntaxException, IOException {
+    void solvePuzzle1() {
         var inputs = TestHelper.readInputLines("/day1-encoded-calibration-values.txt");
 
         var result = inputs.stream().map(EncodedCalibrationValue::new)
@@ -66,7 +66,7 @@ class CalibrationDecoderTest {
     }
 
     @Test
-    void solvePuzzle2() throws URISyntaxException, IOException {
+    void solvePuzzle2() {
         var inputs = TestHelper.readInputLines("/day1-encoded-calibration-values.txt");
 
         var result = inputs.stream().map(EncodedCalibrationValue::new)

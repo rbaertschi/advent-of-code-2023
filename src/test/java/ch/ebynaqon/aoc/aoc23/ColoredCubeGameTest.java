@@ -1,13 +1,7 @@
 package ch.ebynaqon.aoc.aoc23;
 
-import ch.ebynaqon.aoc.aoc23.ColoredCubeGame.Draw;
-import ch.ebynaqon.aoc.aoc23.ColoredCubeGame.Game;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,8 +39,8 @@ public class ColoredCubeGameTest {
     }
 
     @Test
-    void sumUpValidGameIdsForStep1() throws URISyntaxException, IOException {
-        var inputs = Files.readAllLines(Path.of(getClass().getResource("/day2-games-with-draws.txt").toURI()));
+    void sumUpValidGameIdsForStep1() {
+        var inputs = TestHelper.readInputLines("/day2-games-with-draws.txt");
 
         var actual = sumUpValidGameIds(inputs);
 
@@ -70,7 +64,7 @@ public class ColoredCubeGameTest {
     }
 
     @Test
-    void calculateSumOfPowerOfMinimumDrawsForStep2() throws URISyntaxException, IOException {
+    void calculateSumOfPowerOfMinimumDrawsForStep2() {
         var inputs = TestHelper.readInputLines("/day2-games-with-draws.txt");
 
         var actual = sumUpPowerOfMinimalDraws(inputs);

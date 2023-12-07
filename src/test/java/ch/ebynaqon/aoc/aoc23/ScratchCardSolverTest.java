@@ -2,9 +2,6 @@ package ch.ebynaqon.aoc.aoc23;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ScratchCardSolverTest {
@@ -34,7 +31,7 @@ class ScratchCardSolverTest {
     }
 
     @Test
-    void solvePart1() throws IOException, URISyntaxException {
+    void solvePart1() {
         var input = TestHelper.readInput("/day4-scratch-games.txt").trim();
 
         var actual = ScratchCardSolver.solveAllGames(input);
@@ -59,7 +56,7 @@ class ScratchCardSolverTest {
     }
 
     @Test
-    void solvePart2WithNumberOfScratchCardsWon() throws IOException, URISyntaxException {
+    void solvePart2WithNumberOfScratchCardsWon() {
         var input = TestHelper.readInput("/day4-scratch-games.txt").trim();
 
         var actual = ScratchCardSolver.solveAllGamesWitCardMultiplication(input);

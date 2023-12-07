@@ -6,8 +6,6 @@ import ch.ebynaqon.aoc.aoc23.GardenAlmanach.RangeMappingResult;
 import ch.ebynaqon.aoc.aoc23.GardenAlmanach.ValueRange;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,17 +73,17 @@ class GardenAlmanachTest {
                                 new RangeMapping(57L, 7L, 4L)
                         )),
                         new Conversion(List.of(
-                                new RangeMapping(88L,18L,7L),
-                                new RangeMapping(18L,25L,70L)
+                                new RangeMapping(88L, 18L, 7L),
+                                new RangeMapping(18L, 25L, 70L)
                         )),
                         new Conversion(List.of(
-                                new RangeMapping(45L,77L,23L),
-                                new RangeMapping(81L,45L,19L),
-                                new RangeMapping(68L,64L,13L)
+                                new RangeMapping(45L, 77L, 23L),
+                                new RangeMapping(81L, 45L, 19L),
+                                new RangeMapping(68L, 64L, 13L)
                         )),
                         new Conversion(List.of(
-                                new RangeMapping(0L,69L,1L),
-                                new RangeMapping(1L,0L,69L)
+                                new RangeMapping(0L, 69L, 1L),
+                                new RangeMapping(1L, 0L, 69L)
                         )),
                         new Conversion(List.of(
                                 new RangeMapping(60L, 56L, 37L),
@@ -108,7 +106,7 @@ class GardenAlmanachTest {
     }
 
     @Test
-    void getClosestSeedLocationForPuzzleInputPart1() throws IOException, URISyntaxException {
+    void getClosestSeedLocationForPuzzleInputPart1() {
         var input = TestHelper.readInput("/day5-gardening-almanach.txt").trim();
 
         var almanach = GardenAlmanach.of(input);
@@ -118,7 +116,7 @@ class GardenAlmanachTest {
     }
 
     @Test
-    void sanityCheck() throws IOException, URISyntaxException {
+    void sanityCheck() {
         var input = TestHelper.readInput("/day5-gardening-almanach.txt").trim();
 
         var almanach = GardenAlmanach.of(input);
@@ -163,7 +161,7 @@ class GardenAlmanachTest {
     }
 
     @Test
-    void getClosestSeedLocationFromRangesForPuzzleInput() throws IOException, URISyntaxException {
+    void getClosestSeedLocationFromRangesForPuzzleInput() {
         var input = TestHelper.readInput("/day5-gardening-almanach.txt").trim();
 
         var actual = GardenAlmanach.of(input)
@@ -171,7 +169,6 @@ class GardenAlmanachTest {
 
         assertThat(actual).isEqualTo(84206669L);
     }
-
 
 
 }

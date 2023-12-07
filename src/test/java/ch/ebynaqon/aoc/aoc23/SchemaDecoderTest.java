@@ -5,8 +5,6 @@ import ch.ebynaqon.aoc.aoc23.SchemaDecoder.Number;
 import ch.ebynaqon.aoc.aoc23.SchemaDecoder.Symbol;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Set;
 
@@ -97,7 +95,7 @@ class SchemaDecoderTest {
     }
 
     @Test
-    void sumOfPartNumbersForPuzzleInputPart1() throws IOException, URISyntaxException {
+    void sumOfPartNumbersForPuzzleInputPart1() {
         var input = TestHelper.readInput("/day3-schematic-of-part-numbers.txt").trim();
 
         var actual = new SchemaDecoder(input).sumOfPartNumbers();
@@ -106,7 +104,7 @@ class SchemaDecoderTest {
     }
 
     @Test
-    void sumOfGearRatiosForPuzzleInputPart2() throws IOException, URISyntaxException {
+    void sumOfGearRatiosForPuzzleInputPart2() {
         var input = TestHelper.readInput("/day3-schematic-of-part-numbers.txt").trim();
 
         var actual = new SchemaDecoder(input).sumOfGearRatios();

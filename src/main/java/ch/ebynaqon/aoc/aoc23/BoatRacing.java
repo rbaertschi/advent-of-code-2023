@@ -5,6 +5,9 @@ import java.util.List;
 
 // 7ms -> distance = (7x - x*x) 1mm
 // d(distance)=7-2x=0 -> 7 = 2x -> x = 7 / 2
+// d = t * x - 1 * x * x  ->  0 = - 1 * x^2 + t * x - d  ->  a=-1, b=t, c=-d
+// x1 = (-b - sqrt(b*b - 4ac)) / 2a = (t + sqrt(t*t - 4d)) / 2
+// x2 = (-b + sqrt(b*b - 4ac)) / 2a = (t - sqrt(t*t - 4d)) / 2
 public class BoatRacing {
     public static List<Race> parse(String input) {
         String[] lines = input.split("\n");
@@ -12,56 +15,31 @@ public class BoatRacing {
         String[] distances = lines[1].split(":")[1].trim().split("\\s+");
         ArrayList<Race> races = new ArrayList<>();
         for (int i = 0; i < times.length; i++) {
-            races.add(new Race(Integer.parseInt(times[i]), Integer.parseInt(distances[i])));
+            races.add(new Race(Long.parseLong(times[i]), Long.parseLong(distances[i])));
         }
         return races;
     }
 
-    public static List<Race> parseWithoutSpaces(String input) {
-        String[] lines = input.split("\n");
-        return List.of(
-                new Race(
-                        Long.parseLong(lines[0].split(":")[1].trim().replaceAll("\\s", "")),
-                        Long.parseLong(lines[1].split(":")[1].trim().replaceAll("\\s", ""))
-                )
-        );
-    }
-
-    public static int solve(String input) {
+    public static long solve(String input) {
         List<Race> races = parse(input);
-        return races.stream().map(Race::winningTimes)
-                .mapToInt(List::size)
-                .reduce(1, (acc, cur) -> acc * cur);
+        return races.stream().mapToLong(Race::countWinningTimes)
+                .reduce(1, Math::multiplyExact);
     }
 
-    public static int solveWithoutSpaces(String input) {
-        List<Race> races = parseWithoutSpaces(input);
-        return races.stream().map(Race::winningTimes)
-                .mapToInt(List::size)
-                .reduce(1, (acc, cur) -> acc * cur);
+    private static long calculateDistance(long totalTime, long waitTime) {
+        return ((totalTime - waitTime) * waitTime);
     }
 
     public record Race(long time, long maxDistance) {
-        public List<Long> winningTimes() {
-            var winningTimes = new ArrayList<Long>();
-            var bestTime = time() / 2;
-            for (long i = bestTime; i < time(); i++) {
-                var distance = (time - i) * i;
-                if (distance > maxDistance()) {
-                    winningTimes.add(i);
-                } else {
-                    break;
-                }
-            }
-            for (long i = bestTime - 1; i > 0; i--) {
-                var distance = (time - i) * i;
-                if (distance > maxDistance()) {
-                    winningTimes.add(i);
-                } else {
-                    break;
-                }
-            }
-            return winningTimes;
+        public Long countWinningTimes() {
+            var discriminator = time() * time() - 4 * maxDistance();
+            // x1 = (t + sqrt(t*t - 4d)) / 2
+            var lower = (long) ((time() - Math.sqrt(discriminator)) / 2);
+            // x2 = (t - sqrt(t*t - 4d)) / 2
+            var upper = (long) ((time() + Math.sqrt(discriminator)) / 2);
+            if (calculateDistance(time(), lower) <= maxDistance()) lower++;
+            if (calculateDistance(time(), upper) <= maxDistance()) upper--;
+            return upper - lower + 1;
         }
     }
 }

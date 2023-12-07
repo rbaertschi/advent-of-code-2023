@@ -85,7 +85,7 @@ class CamelCardsTest {
     }
 
     @Test
-    void solvePuzzleInputPart1() throws IOException, URISyntaxException {
+    void solvePuzzleInputPart1() {
         var input = TestHelper.readInput("/day7-camel-cards.txt").trim();
 
         var actual = CamelCards.solve(input);
@@ -94,7 +94,7 @@ class CamelCardsTest {
     }
 
     @Test
-    void solvePuzzleInputPart2() throws IOException, URISyntaxException {
+    void solvePuzzleInputPart2() {
         var input = TestHelper.readInput("/day7-camel-cards.txt").trim().replaceAll("J", "?");
 
         var actual = CamelCards.solve(input);
