@@ -1,4 +1,4 @@
-package ch.ebynaqon.adventofcode23;
+package ch.ebynaqon.aoc.aoc23;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

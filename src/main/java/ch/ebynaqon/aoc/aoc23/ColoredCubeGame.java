@@ -1,4 +1,4 @@
-package ch.ebynaqon.adventofcode23;
+package ch.ebynaqon.aoc.aoc23;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,8 +1,8 @@
-package ch.ebynaqon.adventofcode23;
+package ch.ebynaqon.aoc.aoc23;
 
-import ch.ebynaqon.adventofcode23.SchemaDecoder.Line;
-import ch.ebynaqon.adventofcode23.SchemaDecoder.Number;
-import ch.ebynaqon.adventofcode23.SchemaDecoder.Symbol;
+import ch.ebynaqon.aoc.aoc23.SchemaDecoder.Line;
+import ch.ebynaqon.aoc.aoc23.SchemaDecoder.Number;
+import ch.ebynaqon.aoc.aoc23.SchemaDecoder.Symbol;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

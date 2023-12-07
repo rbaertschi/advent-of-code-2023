@@ -1,9 +1,9 @@
-package ch.ebynaqon.adventofcode23;
+package ch.ebynaqon.aoc.aoc23;
 
-import ch.ebynaqon.adventofcode23.GardenAlmanach.Conversion;
-import ch.ebynaqon.adventofcode23.GardenAlmanach.RangeMapping;
-import ch.ebynaqon.adventofcode23.GardenAlmanach.RangeMappingResult;
-import ch.ebynaqon.adventofcode23.GardenAlmanach.ValueRange;
+import ch.ebynaqon.aoc.aoc23.GardenAlmanach.Conversion;
+import ch.ebynaqon.aoc.aoc23.GardenAlmanach.RangeMapping;
+import ch.ebynaqon.aoc.aoc23.GardenAlmanach.RangeMappingResult;
+import ch.ebynaqon.aoc.aoc23.GardenAlmanach.ValueRange;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

@@ -1,7 +1,7 @@
-package ch.ebynaqon.adventofcode23;
+package ch.ebynaqon.aoc.aoc23;
 
-import ch.ebynaqon.adventofcode23.ColoredCubeGame.Draw;
-import ch.ebynaqon.adventofcode23.ColoredCubeGame.Game;
+import ch.ebynaqon.aoc.aoc23.ColoredCubeGame.Draw;
+import ch.ebynaqon.aoc.aoc23.ColoredCubeGame.Game;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import static ch.ebynaqon.adventofcode23.ColoredCubeGame.*;
+import static ch.ebynaqon.aoc.aoc23.ColoredCubeGame.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ColoredCubeGameTest {
