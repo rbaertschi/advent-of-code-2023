@@ -6,7 +6,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,18 +17,6 @@ class MathHelperTest {
         long actual = MathHelper.leastCommonMultiple(List.of(79 * 307, 61 * 307));
 
         assertThat(actual).isEqualTo(79 * 61 * 307);
-    }
-
-    @Test
-    void histogram() {
-        assertThat(MathHelper.histogram(List.of(1, 2, 2, 2, 3, 7, 8, 8)))
-                .isEqualTo(Map.of(
-                        1, 1,
-                        2, 3,
-                        3, 1,
-                        7, 1,
-                        8, 2
-                ));
     }
 
     @ParameterizedTest

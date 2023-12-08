@@ -2,8 +2,12 @@ package ch.ebynaqon.aoc.aoc23;
 
 import ch.ebynaqon.aoc.aoc23.helper.TestHelper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,10 +39,43 @@ class CamelCardsTest {
         assertThat(actual).isEqualTo(0x32a3d);
     }
 
-    @Test
-    void scoreKind() {
-        long actual = new CamelCards.Hand("32T3K", 0).scoreKind();
-        assertThat(actual).isEqualTo(CamelCards.Hand.ONE_PAIR);
+    @ParameterizedTest
+    @MethodSource("handsAndKindScores")
+    void scoreKind(String cards, long kindScore) {
+        long actual = new CamelCards.Hand(cards, 0).scoreKind();
+        assertThat(actual).isEqualTo(kindScore);
+    }
+
+    public static Stream<Arguments> handsAndKindScores() {
+        return Stream.of(
+                // five of a kind
+                Arguments.of("77777", CamelCards.Hand.FIVE_OF_A_KIND),
+                Arguments.of("777?7", CamelCards.Hand.FIVE_OF_A_KIND),
+                Arguments.of("?77?7", CamelCards.Hand.FIVE_OF_A_KIND),
+                Arguments.of("?7??7", CamelCards.Hand.FIVE_OF_A_KIND),
+                Arguments.of("????7", CamelCards.Hand.FIVE_OF_A_KIND),
+                Arguments.of("?????", CamelCards.Hand.FIVE_OF_A_KIND),
+                // four of a kind
+                Arguments.of("77771", CamelCards.Hand.FOUR_OF_A_KIND),
+                Arguments.of("777?1", CamelCards.Hand.FOUR_OF_A_KIND),
+                Arguments.of("?77?1", CamelCards.Hand.FOUR_OF_A_KIND),
+                Arguments.of("?7??1", CamelCards.Hand.FOUR_OF_A_KIND),
+                // full house
+                Arguments.of("32323", CamelCards.Hand.FULL_HOUSE),
+                Arguments.of("32?23", CamelCards.Hand.FULL_HOUSE),
+                // three of a kind
+                Arguments.of("32T33", CamelCards.Hand.THREE_OF_A_KIND),
+                Arguments.of("32?3T", CamelCards.Hand.THREE_OF_A_KIND),
+                Arguments.of("?2T33", CamelCards.Hand.THREE_OF_A_KIND),
+                Arguments.of("32T??", CamelCards.Hand.THREE_OF_A_KIND),
+                // two pairs
+                Arguments.of("32T3T", CamelCards.Hand.TWO_PAIRS),
+                // one pair
+                Arguments.of("32T3K", CamelCards.Hand.ONE_PAIR),
+                Arguments.of("32T?K", CamelCards.Hand.ONE_PAIR),
+                // individual cards
+                Arguments.of("93671", CamelCards.Hand.INDIVIDUAL_CARD)
+        );
     }
 
     @Test
@@ -99,5 +136,10 @@ class CamelCardsTest {
         var actual = CamelCards.solve(input);
 
         assertThat(actual).isEqualTo(249515436);
+    }
+
+    @Test
+    void name() {
+        new CamelCards.Hand("ABCBAA", 0).scoreKind();
     }
 }

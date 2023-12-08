@@ -1,8 +1,12 @@
 package ch.ebynaqon.aoc.aoc23;
 
+import ch.ebynaqon.aoc.aoc23.helper.CollectionHelper;
+import ch.ebynaqon.aoc.aoc23.helper.StatisticsHelper;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 public class CamelCards {
     public static List<Hand> parse(String input) {
@@ -13,15 +17,18 @@ public class CamelCards {
     }
 
     public static long solve(String input) {
-        List<Hand> hands = parse(input).stream().sorted(Comparator.comparing(Hand::score)).toList();
-        long sum = 0;
-        for (int i = 0; i < hands.size(); i++) {
-            sum += (i + 1) * hands.get(i).bet();
-        }
-        return sum;
+        return CollectionHelper.zipWithIndex(
+                        parse(input).stream()
+                                .sorted(Comparator.comparing(Hand::score))
+                                .toList()
+                ).stream()
+                .mapToLong(idxVal -> (idxVal.index() + 1) * idxVal.value().bet())
+                .sum();
+
     }
 
     public record Hand(String cards, long bet) {
+        public static long INDIVIDUAL_CARD = 0x000000;
         public static long ONE_PAIR = 0x100000;
         public static long TWO_PAIRS = 0x200000;
         public static long THREE_OF_A_KIND = 0x300000;
@@ -38,90 +45,63 @@ public class CamelCards {
         3 - Three of a kind - where three cards have the same label, and the remaining two cards are each different from any other card in the hand: TTT98
         2 - Two pair        - where two cards share one label, two other cards share a second label, and the remaining card has a third label: 23432
         1 - One pair        - where two cards share one label, and the other three cards have a different label from the pair and each other: A23A4
-        High card
+        0 - Single card
         * */
         public long score() {
             return scoreKind() + scoreCards();
         }
 
         public long scoreKind() {
-            var sortedCards = Arrays.stream((cards().split(""))).sorted().toList();
-            var previousCard = "";
-            var sameCardCount = 0;
-            var pairs = 0;
-            var threeOfAKind = 0;
-            var fourOfAKind = 0;
-            var fiveOfAKind = 0;
-            var jokers = 0;
-            for (var card : sortedCards) {
-                if (card.equals("?")) {
-                    jokers++;
-                } else if (card.equals(previousCard)) {
-                    sameCardCount++;
-                } else {
-                    if (sameCardCount == 2) {
-                        pairs++;
-                    } else if (sameCardCount == 3) {
-                        threeOfAKind++;
-                    } else if (sameCardCount == 4) {
-                        fourOfAKind++;
-                    } else if (sameCardCount == 5) {
-                        fiveOfAKind++;
-                    }
-                    sameCardCount = 1;
-                }
-                previousCard = card;
-            }
-            if (sameCardCount == 2) {
-                pairs++;
-            } else if (sameCardCount == 3) {
-                threeOfAKind++;
-            } else if (sameCardCount == 4) {
-                fourOfAKind++;
-            } else if (sameCardCount == 5) {
-                fiveOfAKind++;
-            }
-            if (fiveOfAKind == 1) {
+            var histogram = StatisticsHelper.histogram(List.of(cards().split("")));
+            var jokers = histogram.getOrDefault("?", 0);
+            var counts = histogram.entrySet().stream()
+                    .filter(e -> !"?".equals(e.getKey()))
+                    .map(Map.Entry::getValue)
+                    .sorted(Comparator.reverseOrder())
+                    .toList();
+            if (jokers == 5) {
                 return FIVE_OF_A_KIND;
             }
-            if (fourOfAKind == 1) {
-                if (jokers == 1) return FIVE_OF_A_KIND;
-                return FOUR_OF_A_KIND;
-            }
-            if (threeOfAKind == 1) {
-                if (jokers == 2) return FIVE_OF_A_KIND;
-                if (jokers == 1) return FOUR_OF_A_KIND;
-                if (pairs == 1) {
-                    return FULL_HOUSE;
-                } else {
-                    return THREE_OF_A_KIND;
-                }
-            }
-            if (pairs == 2) {
-                if (jokers == 1) return FULL_HOUSE;
-                return TWO_PAIRS;
-            }
-            if (pairs == 1) {
-                if (jokers == 3) return FIVE_OF_A_KIND;
-                if (jokers == 2) return FOUR_OF_A_KIND;
-                if (jokers == 1) return THREE_OF_A_KIND;
-                return ONE_PAIR;
-            }
-            if (jokers == 5) return FIVE_OF_A_KIND;
-            if (jokers == 4) return FIVE_OF_A_KIND;
-            if (jokers == 3) return FOUR_OF_A_KIND;
-            if (jokers == 2) return THREE_OF_A_KIND;
-            if (jokers == 1) return ONE_PAIR;
-            return 0;
+            return switch (counts.getFirst()) {
+                case 5 -> FIVE_OF_A_KIND;
+                case 4 -> jokers == 1
+                        ? FIVE_OF_A_KIND
+                        : FOUR_OF_A_KIND;
+                case 3 -> jokers == 2
+                        ? FIVE_OF_A_KIND
+                        : jokers == 1
+                        ? FOUR_OF_A_KIND
+                        : counts.get(1) == 2
+                        ? FULL_HOUSE
+                        : THREE_OF_A_KIND;
+                case 2 -> jokers == 3
+                        ? FIVE_OF_A_KIND
+                        : jokers == 2
+                        ? FOUR_OF_A_KIND
+                        : jokers == 1 && counts.get(1) == 2
+                        ? FULL_HOUSE
+                        : jokers == 1
+                        ? THREE_OF_A_KIND
+                        : counts.get(1) == 2
+                        ? TWO_PAIRS
+                        : ONE_PAIR;
+                default -> jokers == 4
+                        ? FIVE_OF_A_KIND
+                        : jokers == 3
+                        ? FOUR_OF_A_KIND
+                        : jokers == 2
+                        ? THREE_OF_A_KIND
+                        : jokers == 1
+                        ? ONE_PAIR
+                        : INDIVIDUAL_CARD;
+            };
         }
 
         public long scoreCards() {
-            String[] individualCards = cards().split("");
-            long sum = 0;
-            for (int i = 0; i < individualCards.length; i++) {
-                sum += scoreCard(individualCards[i]) * POSITION_WEIGHT[i];
-            }
-            return sum;
+            return CollectionHelper.zipWithIndex(Arrays.asList(cards().split("")))
+                    .stream()
+                    .mapToLong(indexAndCard -> scoreCard(indexAndCard.value()) * POSITION_WEIGHT[indexAndCard.index()])
+                    .sum();
         }
 
         private long scoreCard(String card) {
