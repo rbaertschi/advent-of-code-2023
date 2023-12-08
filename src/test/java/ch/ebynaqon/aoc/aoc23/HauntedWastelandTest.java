@@ -3,6 +3,7 @@ package ch.ebynaqon.aoc.aoc23;
 import ch.ebynaqon.aoc.aoc23.HauntedWasteland.Instruction;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,5 +93,36 @@ class HauntedWastelandTest {
         var actual = HauntedWasteland.solveGhostly(input);
 
         assertThat(actual).isEqualTo(21797);
+    }
+
+    @Test
+    void solveGhostlyPart2B() {
+        var input = TestHelper.readInput("/day8-input.txt");
+
+        var actual = HauntedWasteland.solveGhostly2(input);
+
+        assertThat(actual).isEqualTo(21797);
+    }
+
+    @Test
+    void xxx() {
+        var input = TestHelper.readInput("/day8-input.txt");
+
+        var actual = HauntedWasteland.numberOfStepsFromGivenPositionToPositionEndingInZ(input, "TVZ");
+
+        assertThat(actual).isEqualTo(21797);
+    }
+
+    @Test
+    void bigIntMultiplication() {
+        String actual = (BigInteger.valueOf(70))
+                .multiply(BigInteger.valueOf(61))
+                .multiply(BigInteger.valueOf(59))
+                .multiply(BigInteger.valueOf(71))
+                .multiply(BigInteger.valueOf(73))
+                .multiply(BigInteger.valueOf(53))
+                .multiply(BigInteger.valueOf(307))
+                .toString();
+        assertThat(actual).isEqualTo("21245910154491");
     }
 }
