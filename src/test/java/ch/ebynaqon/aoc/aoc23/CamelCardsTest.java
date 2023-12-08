@@ -1,9 +1,8 @@
 package ch.ebynaqon.aoc.aoc23;
 
+import ch.ebynaqon.aoc.aoc23.helper.TestHelper;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;

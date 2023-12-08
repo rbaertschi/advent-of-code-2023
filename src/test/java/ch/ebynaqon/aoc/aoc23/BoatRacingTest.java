@@ -1,5 +1,6 @@
 package ch.ebynaqon.aoc.aoc23;
 
+import ch.ebynaqon.aoc.aoc23.helper.TestHelper;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -58,7 +59,7 @@ class BoatRacingTest {
 
     @Test
     void sloveForPuzzleInput() {
-        var input = TestHelper.readInput("/day6-input.txt").trim();
+        var input = TestHelper.readInput("/day6-boat-racing.txt").trim();
 
         var actual = BoatRacing.solve(input);
 
@@ -67,7 +68,7 @@ class BoatRacingTest {
 
     @Test
     void sloveForPuzzleInput2() {
-        var input = TestHelper.readInput("/day6-input.txt").trim()
+        var input = TestHelper.readInput("/day6-boat-racing.txt").trim()
                 .replaceAll("[ ]+", "");
         System.out.println(input);
         var actual = BoatRacing.solve(input);

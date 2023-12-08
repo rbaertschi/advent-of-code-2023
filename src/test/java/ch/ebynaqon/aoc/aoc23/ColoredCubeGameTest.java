@@ -1,5 +1,6 @@
 package ch.ebynaqon.aoc.aoc23;
 
+import ch.ebynaqon.aoc.aoc23.helper.TestHelper;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

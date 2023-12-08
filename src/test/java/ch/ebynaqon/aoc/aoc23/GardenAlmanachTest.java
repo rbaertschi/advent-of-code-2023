@@ -4,6 +4,7 @@ import ch.ebynaqon.aoc.aoc23.GardenAlmanach.Conversion;
 import ch.ebynaqon.aoc.aoc23.GardenAlmanach.RangeMapping;
 import ch.ebynaqon.aoc.aoc23.GardenAlmanach.RangeMappingResult;
 import ch.ebynaqon.aoc.aoc23.GardenAlmanach.ValueRange;
+import ch.ebynaqon.aoc.aoc23.helper.TestHelper;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

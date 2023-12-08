@@ -1,6 +1,7 @@
 package ch.ebynaqon.aoc.aoc23;
 
 import ch.ebynaqon.aoc.aoc23.HauntedWasteland.Instruction;
+import ch.ebynaqon.aoc.aoc23.helper.TestHelper;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -78,7 +79,7 @@ class HauntedWastelandTest {
 
     @Test
     void solvePart1() {
-        var input = TestHelper.readInput("/day8-input.txt");
+        var input = TestHelper.readInput("/day8-haunted-wasteland.txt");
 
         var actual = HauntedWasteland.solve(input);
 
@@ -87,7 +88,7 @@ class HauntedWastelandTest {
 
     @Test
     void solveGhostlyPart2() {
-        var input = TestHelper.readInput("/day8-input.txt");
+        var input = TestHelper.readInput("/day8-haunted-wasteland.txt");
 
         var actual = HauntedWasteland.solveGhostly(input);
 
