@@ -70,7 +70,7 @@ class BoatRacingTest {
     void sloveForPuzzleInput2() {
         var input = TestHelper.readInput("/day6-boat-racing.txt").trim()
                 .replaceAll("[ ]+", "");
-        System.out.println(input);
+
         var actual = BoatRacing.solve(input);
 
         assertThat(actual).isEqualTo(40087680);
