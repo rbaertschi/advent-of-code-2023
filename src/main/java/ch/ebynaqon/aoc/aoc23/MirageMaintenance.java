@@ -16,6 +16,10 @@ public record MirageMaintenance(List<Sequence> sequences) {
         return sequences().stream().mapToLong(Sequence::predictNext).sum();
     }
 
+    public long sumOfPreviousPredictions() {
+        return sequences().stream().mapToLong(Sequence::predictPrevious).sum();
+    }
+
     public record Sequence(List<Long> numbers) {
         public static Sequence of(String line) {
             return new Sequence(Arrays.stream(line.split("\\s+"))
@@ -28,6 +32,13 @@ public record MirageMaintenance(List<Sequence> sequences) {
                 return 0L;
             }
             return numbers().getLast() + differences().predictNext();
+        }
+
+        public long predictPrevious() {
+            if (isAllZeros()){
+                return 0L;
+            }
+            return numbers().getFirst() - differences().predictPrevious();
         }
 
         public Sequence differences() {

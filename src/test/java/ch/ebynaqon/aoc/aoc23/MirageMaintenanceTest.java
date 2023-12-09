@@ -52,12 +52,21 @@ class MirageMaintenanceTest {
     }
 
     @Test
-    void solveExample() {
+    void perdictNextForExample() {
         var input = EXAMPLE.trim();
 
         var actual = MirageMaintenance.parse(input).sumOfNextPredictions();
 
         assertThat(actual).isEqualTo(114L);
+    }
+
+    @Test
+    void perdictPreviousForExample() {
+        var input = EXAMPLE.trim();
+
+        var actual = MirageMaintenance.parse(input).sumOfPreviousPredictions();
+
+        assertThat(actual).isEqualTo(2L);
     }
 
     @Test
@@ -67,5 +76,14 @@ class MirageMaintenanceTest {
         var actual = MirageMaintenance.parse(input).sumOfNextPredictions();
 
         assertThat(actual).isEqualTo(1898776583L);
+    }
+
+    @Test
+    void solvePart2() {
+        var input = TestHelper.readInput("/day9-mirage-maintenance.txt").trim();
+
+        var actual = MirageMaintenance.parse(input).sumOfPreviousPredictions();
+
+        assertThat(actual).isEqualTo(1100L);
     }
 }
