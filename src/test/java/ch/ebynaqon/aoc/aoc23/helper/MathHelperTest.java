@@ -1,6 +1,5 @@
 package ch.ebynaqon.aoc.aoc23.helper;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -12,11 +11,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MathHelperTest {
 
-    @Test
-    void leastCommonMultiple() {
-        long actual = MathHelper.leastCommonMultiple(List.of(79 * 307, 61 * 307));
+    @ParameterizedTest
+    @MethodSource("leastCommonMultipleExamples")
+    void leastCommonMultiple(int a, int b, long lcm) {
+        long actual = MathHelper.leastCommonMultiple(List.of(a, b));
 
-        assertThat(actual).isEqualTo(79 * 61 * 307);
+        assertThat(actual).isEqualTo(lcm);
+    }
+
+    static Stream<Arguments> leastCommonMultipleExamples() {
+        return Stream.of(
+                Arguments.of(1, 1, 1),
+                Arguments.of(2, 1, 2),
+                Arguments.of(2 * 3, 5, 2 * 3 * 5),
+                Arguments.of(79 * 307, 61 * 307, 79 * 61 * 307),
+                Arguments.of(2 * 3 * 5 * 7 * 11 * 13, 7 * 11 * 13 * 17 * 19 * 23, 2 * 3 * 5 * 7 * 11 * 13 * 17 * 19 * 23)
+        );
     }
 
     @ParameterizedTest
@@ -25,7 +35,7 @@ class MathHelperTest {
         assertThat(MathHelper.factorize(number)).isEqualTo(factors);
     }
 
-    public static Stream<Arguments> factorizeExamples() {
+    static Stream<Arguments> factorizeExamples() {
         return Stream.of(
                 Arguments.of(1, List.of(1)),
                 Arguments.of(2, List.of(1, 2)),

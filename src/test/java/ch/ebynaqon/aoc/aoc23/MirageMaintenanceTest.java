@@ -52,7 +52,7 @@ class MirageMaintenanceTest {
     }
 
     @Test
-    void perdictNextForExample() {
+    void predictNextForExample() {
         var input = EXAMPLE.trim();
 
         var actual = MirageMaintenance.parse(input).sumOfNextPredictions();
@@ -61,7 +61,7 @@ class MirageMaintenanceTest {
     }
 
     @Test
-    void perdictPreviousForExample() {
+    void predictPreviousForExample() {
         var input = EXAMPLE.trim();
 
         var actual = MirageMaintenance.parse(input).sumOfPreviousPredictions();
