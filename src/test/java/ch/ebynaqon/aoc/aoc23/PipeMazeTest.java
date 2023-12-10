@@ -31,7 +31,7 @@ class PipeMazeTest {
     }
 
     @Test
-    void solveExample() {
+    void findMaxDistanceFromStartForSimpleExample() {
         var input = """
                 .....
                 .F-7.
@@ -46,7 +46,22 @@ class PipeMazeTest {
     }
 
     @Test
-    void solveSecondExample() {
+    void getNumberOfTilesInsideLoopForSimpleExample() {
+        var input = """
+                ..F7.
+                .FJ|.
+                SJ.L7
+                |F--J
+                LJ...
+                """.trim();
+
+        var actual = PipeMaze.parse(input).getNumberOfTilesInsideLoop(false);
+
+        assertThat(actual).isEqualTo(1);
+    }
+
+    @Test
+    void findMaxDistanceFromStartForSlightlyMoreComplexExample() {
         var input = """
                 ..F7.
                 .FJ|.
@@ -67,5 +82,14 @@ class PipeMazeTest {
         var actual = PipeMaze.parse(input).findMaxDistanceFromStart();
 
         assertThat(actual).isEqualTo(6860);
+    }
+
+    @Test
+    void solvePuzzle2() {
+        var input = TestHelper.readInput("/day10-pipe-maze.txt").trim();
+
+        var actual = PipeMaze.parse(input).getNumberOfTilesInsideLoop(false);
+
+        assertThat(actual).isEqualTo(343);
     }
 }
