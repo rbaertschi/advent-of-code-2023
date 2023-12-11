@@ -86,4 +86,42 @@ class CosmicExpansionTest {
 
         assertThat(actual).isEqualTo(9805264);
     }
+
+    @Test
+    void shortestDistanceForPuzzle1WithAlgorithmForLargeExpansion() {
+        var input = TestHelper.readInput("/day11-cosmic-expansion.txt").trim();
+
+        var actual = CosmicExpansion.sumOfShortestPaths(CosmicExpansion.galaxyPositionsInExpandedUniverse(input, 2));
+
+        assertThat(actual).isEqualTo(9805264);
+    }
+
+    @Test
+    void shortestDistanceForPuzzle2WithAlgorithmForLargeExpansion() {
+        var input = TestHelper.readInput("/day11-cosmic-expansion.txt").trim();
+
+        var actual = CosmicExpansion.sumOfShortestPaths(CosmicExpansion.galaxyPositionsInExpandedUniverse(input, 1_000_000));
+
+        assertThat(actual).isEqualTo(779032247216L);
+    }
+
+    @Test
+    void shortestDistanceForExampleWithExpansionOf10() {
+        var input = """
+                ...#......
+                .......#..
+                #.........
+                ..........
+                ......#...
+                .#........
+                .........#
+                ..........
+                .......#..
+                #...#.....
+                """.trim();
+
+        var actual = CosmicExpansion.sumOfShortestPaths(CosmicExpansion.galaxyPositionsInExpandedUniverse(input, 10));
+
+        assertThat(actual).isEqualTo(1030);
+    }
 }
