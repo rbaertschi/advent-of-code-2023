@@ -11,35 +11,18 @@ public class HotSprings {
         String[] patternAndParts = input.split("\\s+");
         assert patternAndParts.length == 2;
         List<Integer> brokenParts = Arrays.stream(patternAndParts[1].split(",")).map(Integer::parseInt).toList();
-        return new Report(patternAndParts[0], brokenParts);
+        return new Report(patternAndParts[0].trim(), brokenParts);
+    }
+
+    public static long findSumOfArrangements(String input) {
+        return Arrays.stream(input.split("\n"))
+                .map(HotSprings::parseLine)
+                .mapToLong(Report::solve)
+                .sum();
     }
 
     public record Report(String conditions, List<Integer> brokenParts) {
-        public List<List<Integer>> explode2() {
-            int length = conditions.length();
-            int totalBrokenParts = brokenParts().stream().mapToInt(Integer::intValue).sum();
-            int totalSpaces = length - totalBrokenParts;
-            int numberOfGaps = brokenParts().size() - 1;
-            int movableSpaces = totalSpaces - numberOfGaps;
-            int[] remainingSpaces = new int[numberOfGaps + 2];
-            remainingSpaces[0] = movableSpaces;
-
-
-            for (int spacesBefore = 0; spacesBefore <= movableSpaces; spacesBefore++) {
-                for (int spacesAfter = 0; spacesAfter <= movableSpaces - spacesBefore; spacesAfter++) {
-                    int remainingGapSpace = movableSpaces - spacesBefore - spacesAfter;
-                    int[] gapSpaces = new int[numberOfGaps];
-                    for (int gap = 0; gap < numberOfGaps; gap++) {
-                        for (int gapSpace = 0; gapSpace < remainingGapSpace; gapSpace++) {
-                            gapSpaces[gap] = gapSpace;
-                        }
-                    }
-                }
-            }
-            return List.of();
-        }
-
-        public List<List<Integer>> explode() {
+        public List<List<Integer>> generateSpacings() {
             int length = conditions.length();
             int totalBrokenParts = brokenParts().stream().mapToInt(Integer::intValue).sum();
             int totalSpaces = length - totalBrokenParts;
@@ -50,6 +33,7 @@ public class HotSprings {
         }
 
         private List<List<Integer>> distribute(int space, int locations) {
+            System.out.println("%d, %d".formatted(space, locations));
             if (locations == 1) return List.of(List.of(space));
             var distributions = new ArrayList<List<Integer>>();
             for (int i = 0; i <= space; i++) {
@@ -60,5 +44,37 @@ public class HotSprings {
             }
             return distributions;
         }
+
+        public long solve() {
+            List<List<Integer>> lists = generateSpacings();
+            long count = lists.stream()
+                    .filter(spacing -> matchesPattern(spacing, brokenParts(), conditions()))
+                    .count();
+            System.out.println("%d of %d generated patterns match '%s'".formatted(count, lists.size(), conditions()));
+            return count;
+        }
+
+        public static boolean matchesPattern(List<Integer> spacing, List<Integer> broken, String pattern) {
+            String generatedPattern = patternFrom(spacing, broken);
+            for (int i = 0; i < generatedPattern.length(); i++) {
+                if (!(pattern.charAt(i) == '?' || generatedPattern.charAt(i) == pattern.charAt(i)))
+                    return false;
+            }
+            return true;
+        }
+
+        public static String patternFrom(List<Integer> spacing, List<Integer> broken) {
+            StringBuilder pattern = new StringBuilder();
+            pattern.append(".".repeat(spacing.getFirst()));
+            for (int i = 0; i < broken.size(); i++) {
+                boolean isAfterSpace = i == (broken.size() - 1);
+                pattern.append("#".repeat(broken.get(i)))
+                        .append(".".repeat(spacing.get(i + 1) + (isAfterSpace ? 0 : 1)));
+            }
+            String string = pattern.toString();
+//            System.out.println("%s + %s -> %s".formatted(spacing, broken, string));
+            return string;
+        }
+
     }
 }
