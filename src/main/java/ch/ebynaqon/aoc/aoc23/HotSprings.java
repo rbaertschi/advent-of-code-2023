@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 public class HotSprings {
     public static Report parseLine(String input) {
@@ -14,79 +13,58 @@ public class HotSprings {
         return new Report(patternAndParts[0].trim(), brokenParts);
     }
 
-    public static long findSumOfArrangements(String input, boolean duplicate) {
+    public static long sumOfMatchingPatterns(String input, boolean unfold) {
         return Arrays.stream(input.split("\n"))
                 .map(HotSprings::parseLine)
-                .map(report -> {
-                    if (duplicate) {
-                        var duplicated = new ArrayList<Integer>();
-                        for (int i = 0; i < 5; i++) {
-                            duplicated.addAll(report.brokenParts());
-                        }
-                        String duplicatedPattern = (report.conditions() + "?").repeat(5);
-                        return new Report(duplicatedPattern.substring(0, duplicatedPattern.length() - 1), duplicated);
-                    }
-                    return report;
-                })
-                .mapToLong(Report::solve)
+                .map(report -> unfold ? unfold(report) : report)
+                .mapToLong(Report::countMatchingPatterns)
                 .sum();
     }
 
-    public record Report(String conditions, List<Integer> brokenParts) {
-        public long generateSpacings() {
+    private static Report unfold(Report report) {
+        var duplicated = new ArrayList<Integer>();
+        for (int i = 0; i < 5; i++) {
+            duplicated.addAll(report.brokenParts());
+        }
+        String duplicatedPattern = (report.pattern() + "?").repeat(5);
+        return new Report(duplicatedPattern.substring(0, duplicatedPattern.length() - 1), duplicated);
+    }
+
+    public record Report(String pattern, List<Integer> brokenParts) {
+        public long countMatchingPatterns() {
             var lookupTable = new HashMap<String, Long>();
-            int length = conditions.length();
+            int length = pattern.length();
             int totalBrokenParts = brokenParts().stream().mapToInt(Integer::intValue).sum();
             int totalSpaces = length - totalBrokenParts;
             int numberOfGaps = brokenParts().size() - 1;
             int movableSpaces = totalSpaces - numberOfGaps;
             int numberOfSpacePositions = numberOfGaps + 2;
-            return distribute(movableSpaces, numberOfSpacePositions, 0, lookupTable, 0);
+            return countMatchesForSubset(movableSpaces, numberOfSpacePositions, 0, lookupTable, 0);
         }
 
-        private long distribute(int space, int locations,
-                                int brokenIndex, HashMap<String, Long> lookupTable, int offset) {
-            if (locations == 1) {
-                String finalGeneratedPattern = ".".repeat(space);
-                if (matchesEndOfPattern(finalGeneratedPattern, conditions())) {
-                    return 1;
-                }
-                return 0;
+        private long countMatchesForSubset(int remainingSpaces, int remainingLocations, int currentGroupOfBrokenParts, HashMap<String, Long> lookupTable, int offset) {
+            if (remainingLocations == 1) {
+                return matchesPatternAtOffset(".".repeat(remainingSpaces), this.pattern(), offset) ? 1 : 0;
             }
-            var distributions = 0L;
-            for (int i = 0; i <= space; i++) {
-                int nextSpace = space - i;
-                int nextLocations = locations - 1;
-                String lookupKey = "%d-%d".formatted(nextSpace, nextLocations);
-                String currentPrefix = ".".repeat(i + (brokenIndex == 0 ? 0 : 1)) + "#".repeat(brokenParts().get(brokenIndex));
-                if (matchesPatternAtOffset(currentPrefix, conditions(), offset)) {
-                    var nestedDistributions = 0L;
+            var numberOfMatchingPatterns = 0L;
+            for (int numberOfSpacesInCurrentPosition = 0; numberOfSpacesInCurrentPosition <= remainingSpaces; numberOfSpacesInCurrentPosition++) {
+                int nextRemainingSpaces = remainingSpaces - numberOfSpacesInCurrentPosition;
+                int nextRemainingLocations = remainingLocations - 1;
+                String lookupKey = "%d-%d".formatted(nextRemainingSpaces, nextRemainingLocations);
+                int mandatorySpaceAtCurrentLocation = currentGroupOfBrokenParts == 0 ? 0 : 1;
+                String currentPattern = ".".repeat(numberOfSpacesInCurrentPosition + mandatorySpaceAtCurrentLocation) + "#".repeat(brokenParts().get(currentGroupOfBrokenParts));
+                if (matchesPatternAtOffset(currentPattern, pattern(), offset)) {
                     if (lookupTable.containsKey(lookupKey)) {
-                        nestedDistributions = lookupTable.get(lookupKey);
+                        numberOfMatchingPatterns += lookupTable.get(lookupKey);
                     } else {
-                        nestedDistributions = distribute(nextSpace, nextLocations, brokenIndex + 1, lookupTable, offset + currentPrefix.length());
-                        lookupTable.put(lookupKey, nestedDistributions);
+                        var numberOfMatchingPatternsForRemainingSpaces = countMatchesForSubset(
+                                nextRemainingSpaces, nextRemainingLocations, currentGroupOfBrokenParts + 1, lookupTable, offset + currentPattern.length());
+                        lookupTable.put(lookupKey, numberOfMatchingPatternsForRemainingSpaces);
+                        numberOfMatchingPatterns += numberOfMatchingPatternsForRemainingSpaces;
                     }
-                    distributions += nestedDistributions;
                 }
             }
-            return distributions;
-        }
-
-        public long solve() {
-            return generateSpacings();
-        }
-
-        public static boolean matchesPattern(String generatedPattern, String pattern) {
-            for (int i = 0; i < generatedPattern.length(); i++) {
-                if (!(pattern.charAt(i) == '?' || generatedPattern.charAt(i) == pattern.charAt(i)))
-                    return false;
-            }
-            return true;
-        }
-
-        public static boolean matchesEndOfPattern(String generatedPattern, String pattern) {
-            return matchesPatternAtOffset(generatedPattern, pattern, pattern.length() - generatedPattern.length());
+            return numberOfMatchingPatterns;
         }
 
         public static boolean matchesPatternAtOffset(String generatedPattern, String pattern, int offset) {
@@ -96,17 +74,6 @@ public class HotSprings {
                     return false;
             }
             return true;
-        }
-
-        public static String patternFrom(List<Integer> spacing, List<Integer> broken) {
-            StringBuilder pattern = new StringBuilder();
-            pattern.append(".".repeat(spacing.getFirst()));
-            for (int i = 0; i < broken.size(); i++) {
-                boolean isAfterSpace = i == (broken.size() - 1);
-                pattern.append("#".repeat(broken.get(i)))
-                        .append(".".repeat(spacing.get(i + 1) + (isAfterSpace ? 0 : 1)));
-            }
-            return pattern.toString();
         }
 
     }

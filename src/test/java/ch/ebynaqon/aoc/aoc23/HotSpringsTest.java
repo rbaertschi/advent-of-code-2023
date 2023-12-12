@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class HotSpringsTest {
     @Test
-    void parse() {
+    void parseOneRecord() {
         var input = ".???#??????#. 6,1";
 
         HotSprings.Report actual = HotSprings.parseLine(input);
@@ -18,67 +18,43 @@ class HotSpringsTest {
     }
 
     @Test
-    void explodePatterns() {
+    void countMatchingPatternsWithThreeWildcardsAndOneBrokenPart() {
         var report = new HotSprings.Report("???", List.of(1));
 
-        long patterns = report.generateSpacings();
+        long patterns = report.countMatchingPatterns();
 
         assertThat(patterns).isEqualTo(3);
     }
 
     @Test
-    void explodePatternsLonger() {
+    void countMatchingPatternsWithSixWildcardsAndTwoIndividualBrokenParts() {
         var report = new HotSprings.Report("?????", List.of(1, 1));
 
-        long patterns = report.generateSpacings();
+        long patterns = report.countMatchingPatterns();
 
         assertThat(patterns).isEqualTo(6);
     }
 
     @Test
-    void solveSimpleExample() {
+    void countMatchingPatternsForExampleInput() {
         var report = new HotSprings.Report("???.###", List.of(1, 1, 3));
 
-        long patterns = report.solve();
+        long patterns = report.countMatchingPatterns();
 
         assertThat(patterns).isEqualTo(1);
     }
 
     @Test
-    void solveAnotherExample() {
+    void countMatchingPatternsWithComplexExample() {
         var report = new HotSprings.Report("##???#??.???##?.???", List.of(4,1,1,5,1,1));
 
-        long patterns = report.solve();
+        long patterns = report.countMatchingPatterns();
 
         assertThat(patterns).isEqualTo(2);
     }
 
     @Test
-    void generatePatternFromSpacing() {
-        assertThat(HotSprings.Report.patternFrom(List.of(0, 3, 2), List.of(1, 2)))
-                .isEqualTo("#....##..");
-        assertThat(HotSprings.Report.patternFrom(List.of(0, 0, 0), List.of(1, 1)))
-                .isEqualTo("#.#");
-        assertThat(HotSprings.Report.patternFrom(List.of(1, 0, 0), List.of(1, 1)))
-                .isEqualTo(".#.#");
-        assertThat(HotSprings.Report.patternFrom(List.of(0, 1, 0), List.of(1, 1)))
-                .isEqualTo("#..#");
-        assertThat(HotSprings.Report.patternFrom(List.of(0, 0, 1), List.of(1, 1)))
-                .isEqualTo("#.#.");
-        assertThat(HotSprings.Report.patternFrom(List.of(1, 1, 1, 1), List.of(1, 1, 1)))
-                .isEqualTo(".#..#..#.");
-    }
-
-    @Test
-    void patternMatching() {
-        boolean actual = HotSprings.Report.matchesPattern(
-                HotSprings.Report.patternFrom(List.of(0, 3, 2), List.of(1, 2)), "#..???#.."
-        );
-        assertThat(actual).isEqualTo(true);
-    }
-
-    @Test
-    void solveExample() {
+    void sumOfMatchingPatternsForExample() {
         var input = """
                 ???.### 1,1,3
                 .??..??...?##. 1,1,3
@@ -88,25 +64,25 @@ class HotSpringsTest {
                 ?###???????? 3,2,1
                 """.trim();
 
-        var sum = HotSprings.findSumOfArrangements(input, false);
+        var sum = HotSprings.sumOfMatchingPatterns(input, false);
 
         assertThat(sum).isEqualTo(21);
     }
 
     @Test
-    void solvePart1() {
+    void sumOfMatchingPatternsForPart1() {
         var input = TestHelper.readInput("/day12-hotsprings.txt").trim();
 
-        var patterns = HotSprings.findSumOfArrangements(input, false);
+        var patterns = HotSprings.sumOfMatchingPatterns(input, false);
 
         assertThat(patterns).isEqualTo(7599L);
     }
 
     @Test
-    void solvePart2() {
+    void sumOfMatchingPatternsForPart2() {
         var input = TestHelper.readInput("/day12-hotsprings.txt").trim();
 
-        var patterns = HotSprings.findSumOfArrangements(input, true);
+        var patterns = HotSprings.sumOfMatchingPatterns(input, true);
 
         assertThat(patterns).isEqualTo(15454556629917L);
     }
