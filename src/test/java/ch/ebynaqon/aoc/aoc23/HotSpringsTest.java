@@ -21,29 +21,18 @@ class HotSpringsTest {
     void explodePatterns() {
         var report = new HotSprings.Report("???", List.of(1));
 
-        List<List<Integer>> patterns = report.generateSpacings();
+        long patterns = report.generateSpacings();
 
-        assertThat(patterns).isEqualTo(List.of(
-                List.of(0, 2),
-                List.of(1, 1),
-                List.of(2, 0)
-        ));
+        assertThat(patterns).isEqualTo(3);
     }
 
     @Test
     void explodePatternsLonger() {
         var report = new HotSprings.Report("?????", List.of(1, 1));
 
-        List<List<Integer>> patterns = report.generateSpacings();
+        long patterns = report.generateSpacings();
 
-        assertThat(patterns).isEqualTo(List.of(
-                List.of(0, 0, 2),
-                List.of(0, 1, 1),
-                List.of(0, 2, 0),
-                List.of(1, 0, 1),
-                List.of(1, 1, 0),
-                List.of(2, 0, 0)
-        ));
+        assertThat(patterns).isEqualTo(6);
     }
 
     @Test
@@ -57,7 +46,7 @@ class HotSpringsTest {
 
     @Test
     void solveAnotherExample() {
-        var report = new HotSprings.Report("##???#??.???##?.???", List.of(4, 1, 1, 5, 1, 1));
+        var report = new HotSprings.Report("##???#??.???##?.???", List.of(4,1,1,5,1,1));
 
         long patterns = report.solve();
 
@@ -83,7 +72,7 @@ class HotSpringsTest {
     @Test
     void patternMatching() {
         boolean actual = HotSprings.Report.matchesPattern(
-                List.of(0, 3, 2), List.of(1, 2), "#..???#.."
+                HotSprings.Report.patternFrom(List.of(0, 3, 2), List.of(1, 2)), "#..???#.."
         );
         assertThat(actual).isEqualTo(true);
     }
@@ -99,7 +88,7 @@ class HotSpringsTest {
                 ?###???????? 3,2,1
                 """.trim();
 
-        var sum = HotSprings.findSumOfArrangements(input);
+        var sum = HotSprings.findSumOfArrangements(input, false);
 
         assertThat(sum).isEqualTo(21);
     }
@@ -108,8 +97,17 @@ class HotSpringsTest {
     void solvePart1() {
         var input = TestHelper.readInput("/day12-hotsprings.txt").trim();
 
-        var patterns = HotSprings.findSumOfArrangements(input);
+        var patterns = HotSprings.findSumOfArrangements(input, false);
 
         assertThat(patterns).isEqualTo(7599L);
+    }
+
+    @Test
+    void solvePart2() {
+        var input = TestHelper.readInput("/day12-hotsprings.txt").trim();
+
+        var patterns = HotSprings.findSumOfArrangements(input, true);
+
+        assertThat(patterns).isEqualTo(15454556629917L);
     }
 }
