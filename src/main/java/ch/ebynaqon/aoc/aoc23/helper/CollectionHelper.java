@@ -22,5 +22,11 @@ public class CollectionHelper {
         return indexAndValues;
     }
 
+    public static <T> List<T> concat(List<T> a, List<T> b) {
+        ArrayList<T> combined = new ArrayList<>(a);
+        combined.addAll(b);
+        return combined;
+    }
+
     public record IndexAndValue<T>(int index, T value) {}
 }
