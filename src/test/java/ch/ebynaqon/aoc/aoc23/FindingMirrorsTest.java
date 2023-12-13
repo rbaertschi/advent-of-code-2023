@@ -14,16 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class FindingMirrorsTest {
 
-    public static final String EXAMPLE1 = """
-            #.##..##.
-            ..#.##.#.
-            ##......#
-            ##......#
-            ..#.##.#.
-            ..##..##.
-            #.#.##.#.
-            """.trim();
-
     @Test
     void reverseString() {
         assertThat(FindingMirrors.reverseString("12345")).isEqualTo("54321");
@@ -107,7 +97,7 @@ class FindingMirrorsTest {
                 #.#.##.#.
                 """.trim();
 
-        var actual = FindingMirrors.calculateMirrorScore(input);
+        var actual = FindingMirrors.calculateMirrorScore(input, false);
 
         assertThat(actual).isEqualTo(5);
     }
@@ -124,7 +114,7 @@ class FindingMirrorsTest {
                 #.#..#.##
                 """.trim();
 
-        var actual = FindingMirrors.calculateMirrorScore(input);
+        var actual = FindingMirrors.calculateMirrorScore(input, false);
 
         assertThat(actual).isEqualTo(8);
     }
@@ -141,7 +131,7 @@ class FindingMirrorsTest {
                 #....#..#
                 """.trim();
 
-        var actual = FindingMirrors.calculateMirrorScore(input);
+        var actual = FindingMirrors.calculateMirrorScore(input, false);
 
         assertThat(actual).isEqualTo(400);
     }
@@ -158,7 +148,7 @@ class FindingMirrorsTest {
                 #....#..#
                 """.trim();
 
-        var actual = FindingMirrors.calculateMirrorScore(input);
+        var actual = FindingMirrors.calculateMirrorScore(input, false);
 
         assertThat(actual).isEqualTo(100);
     }
@@ -175,7 +165,7 @@ class FindingMirrorsTest {
                 #####.##.
                 """.trim();
 
-        var actual = FindingMirrors.calculateMirrorScore(input);
+        var actual = FindingMirrors.calculateMirrorScore(input, false);
 
         assertThat(actual).isEqualTo(600);
     }
@@ -188,7 +178,7 @@ class FindingMirrorsTest {
                 ####
                 """.trim();
 
-        var actual = FindingMirrors.calculateMirrorScore(input);
+        var actual = FindingMirrors.calculateMirrorScore(input, false);
 
         assertThat(actual).isEqualTo(1 + 2 + 3 + 100 + 200);
     }
@@ -197,8 +187,77 @@ class FindingMirrorsTest {
     void calculateMirrorScoresForPuzzle1() {
         var input = TestHelper.readInput("/day13-mirrors.txt").trim();
 
-        var actual = FindingMirrors.sumOfMirrorScores(input);
+        var actual = FindingMirrors.sumOfMirrorScores(input, false);
 
         assertThat(actual).isEqualTo(36015);
+    }
+
+    @Test
+    void calculateMirrorScoresWithSmudgeForPuzzle2() {
+        var input = TestHelper.readInput("/day13-mirrors.txt").trim();
+
+        var actual = FindingMirrors.sumOfMirrorScores(input, true);
+
+        assertThat(actual).isEqualTo(65640L);
+    }
+
+    @Test
+    void calculateMirrorScoresWithSmudgeForExample() {
+        var input = """
+                #.##..##.
+                ..#.##.#.
+                ##......#
+                ##......#
+                ..#.##.#.
+                ..##..##.
+                #.#.##.#.
+                                
+                #...##..#
+                #....#..#
+                ..##..###
+                #####.##.
+                #####.##.
+                ..##..###
+                #....#..#
+                """.trim();
+
+        var actual = FindingMirrors.sumOfMirrorScores(input, true);
+
+        assertThat(actual).isEqualTo(400);
+    }
+
+    @Test
+    void generateInputVariations() {
+        var input = """
+                #.
+                .#
+                """.trim();
+
+        var actual = FindingMirrors.generateInputVariations(input, false).toList();
+
+        assertThat(actual).isEqualTo(List.of(
+                input
+        ));
+    }
+
+    @ParameterizedTest
+    @MethodSource("smudgePositions")
+    void inputWithSmudgeAt(int row, int col, String expected) {
+        var input = """
+                #.
+                .#
+                """.trim();
+        var actual = FindingMirrors.inputWithSmudgeAt(input, row, col);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    public static Stream<Arguments> smudgePositions() {
+        return Stream.of(
+                Arguments.of(0, 0, "..\n.#"),
+                Arguments.of(0, 1, "##\n.#"),
+                Arguments.of(1, 0, "#.\n##"),
+                Arguments.of(1, 1, "#.\n..")
+        );
     }
 }

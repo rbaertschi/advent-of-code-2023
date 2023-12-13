@@ -2,6 +2,9 @@ package ch.ebynaqon.aoc.aoc23;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 public class FindingMirrors {
 
@@ -55,18 +58,59 @@ public class FindingMirrors {
         return result;
     }
 
-    public static int calculateMirrorScore(String input) {
+    public static int calculateMirrorScoreForOneInput(String input) {
         List<String> rows = Arrays.asList(input.split("\n"));
         List<String> columns = extractColumns(rows);
         Set<Integer> columnMirrorPoints = findCommonMirrorPoints(rows);
         Set<Integer> rowMirrorPoints = findCommonMirrorPoints(columns);
-        return columnMirrorPoints.stream().mapToInt(i -> i).sum()
-               + rowMirrorPoints.stream().mapToInt(i -> i * 100).sum();
+        int score = columnMirrorPoints.stream().mapToInt(i -> i).sum()
+                 + rowMirrorPoints.stream().mapToInt(i -> i * 100).sum();
+        if (score > 0) {
+            System.out.println(input);
+            System.out.println("---------");
+        }
+        return score;
     }
 
-    public static long sumOfMirrorScores(String input) {
+    public static long sumOfMirrorScores(String input, boolean withSmudge) {
         return Arrays.stream(input.split("\n\n"))
-                .mapToLong(FindingMirrors::calculateMirrorScore)
+                .mapToLong(subInput -> calculateMirrorScore(subInput, withSmudge)
+                )
                 .sum();
+    }
+
+    public static long calculateMirrorScore(String input, boolean withSmudge) {
+        List<Integer> mirrorScores = generateInputVariations(input, withSmudge)
+                .map(FindingMirrors::calculateMirrorScoreForOneInput)
+                .filter(i -> i > 0)
+                .toList();
+        System.out.println(mirrorScores);
+        return mirrorScores.stream().mapToLong(i->i)
+                .max()
+                .getAsLong();
+    }
+
+    static Stream<String> generateInputVariations(String input, boolean withSmudge) {
+        if (!withSmudge) {
+            return Stream.of(input);
+        }
+        String[] lines = input.split("\n");
+        int lineLength = lines[0].length();
+        int lineCount = lines.length;
+        int numberOfVariations = lineLength * lineCount;
+        return IntStream.range(0, numberOfVariations)
+                .mapToObj(smudgePosition -> {
+                    int smudgeRow = smudgePosition / lineLength;
+                    int smudgeCol = smudgePosition % lineLength;
+                    return FindingMirrors.inputWithSmudgeAt(input, smudgeRow, smudgeCol);
+                });
+    }
+
+    static String inputWithSmudgeAt(String input, int smudgeRow, int smudgeCol) {
+        int lineLength = input.indexOf("\n");
+        int smudgePosition = smudgeRow * (lineLength + 1) + smudgeCol;
+        return input.substring(0, smudgePosition)
+               + (input.charAt(smudgePosition) == '#' ? "." : "#")
+               + input.substring(smudgePosition + 1);
     }
 }
