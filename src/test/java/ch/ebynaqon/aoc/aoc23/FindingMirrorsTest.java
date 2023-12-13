@@ -180,25 +180,59 @@ class FindingMirrorsTest {
 
         var actual = FindingMirrors.calculateMirrorScore(input, false);
 
-        assertThat(actual).isEqualTo(1 + 2 + 3 + 100 + 200);
+        /*
+         Not sure what would actually be expected here because the rules don't really explain what should happen if
+         there are multiple mirror lines!
+         I originally assumed, that the score of multiple mirror lines should be summed up but that yielded a result
+         which was not the expected solution for part 2.
+        */
+        assertThat(actual).isEqualTo(100);
     }
 
     @Test
-    void calculateMirrorScoresForPuzzle1() {
-        var input = TestHelper.readInput("/day13-mirrors.txt").trim();
+    void generateInputVariationsWithoutSmudge() {
+        var input = "#.\n.#";
 
-        var actual = FindingMirrors.sumOfMirrorScores(input, false);
+        var actual = FindingMirrors.generateInputVariations(input, false).toList();
 
-        assertThat(actual).isEqualTo(36015);
+        assertThat(actual).isEqualTo(List.of(
+                input
+        ));
     }
 
     @Test
-    void calculateMirrorScoresWithSmudgeForPuzzle2() {
-        var input = TestHelper.readInput("/day13-mirrors.txt").trim();
+    void generateInputVariationsWithSmudge() {
+        var input = "#.\n.#";
 
-        var actual = FindingMirrors.sumOfMirrorScores(input, true);
+        var actual = FindingMirrors.generateInputVariations(input, true).toList();
 
-        assertThat(actual).isEqualTo(65640L);
+        assertThat(actual).isEqualTo(List.of(
+                "..\n.#",
+                "##\n.#",
+                "#.\n##",
+                "#.\n.."
+        ));
+    }
+
+    @ParameterizedTest
+    @MethodSource("smudgePositions")
+    void inputWithSmudgeAt(int row, int col, String expected) {
+        var input = """
+                #.
+                .#
+                """.trim();
+        var actual = FindingMirrors.inputWithSmudgeAt(input, row, col);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    public static Stream<Arguments> smudgePositions() {
+        return Stream.of(
+                Arguments.of(0, 0, "..\n.#"),
+                Arguments.of(0, 1, "##\n.#"),
+                Arguments.of(1, 0, "#.\n##"),
+                Arguments.of(1, 1, "#.\n..")
+        );
     }
 
     @Test
@@ -227,37 +261,20 @@ class FindingMirrorsTest {
     }
 
     @Test
-    void generateInputVariations() {
-        var input = """
-                #.
-                .#
-                """.trim();
+    void calculateMirrorScoresWithoutSmudgeForPuzzle1() {
+        var input = TestHelper.readInput("/day13-mirrors.txt").trim();
 
-        var actual = FindingMirrors.generateInputVariations(input, false).toList();
+        var actual = FindingMirrors.sumOfMirrorScores(input, false);
 
-        assertThat(actual).isEqualTo(List.of(
-                input
-        ));
+        assertThat(actual).isEqualTo(36015);
     }
 
-    @ParameterizedTest
-    @MethodSource("smudgePositions")
-    void inputWithSmudgeAt(int row, int col, String expected) {
-        var input = """
-                #.
-                .#
-                """.trim();
-        var actual = FindingMirrors.inputWithSmudgeAt(input, row, col);
+    @Test
+    void calculateMirrorScoresWithSmudgeForPuzzle2() {
+        var input = TestHelper.readInput("/day13-mirrors.txt").trim();
 
-        assertThat(actual).isEqualTo(expected);
-    }
+        var actual = FindingMirrors.sumOfMirrorScores(input, true);
 
-    public static Stream<Arguments> smudgePositions() {
-        return Stream.of(
-                Arguments.of(0, 0, "..\n.#"),
-                Arguments.of(0, 1, "##\n.#"),
-                Arguments.of(1, 0, "#.\n##"),
-                Arguments.of(1, 1, "#.\n..")
-        );
+        assertThat(actual).isEqualTo(35335);
     }
 }
