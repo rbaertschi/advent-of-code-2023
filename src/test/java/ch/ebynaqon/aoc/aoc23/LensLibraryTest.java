@@ -30,7 +30,7 @@ class LensLibraryTest {
     @ParameterizedTest
     @MethodSource("stepsAndHashes")
     void verifyHashing(String input, int hash) {
-        var actual = LensLibrary.hash(input);
+        var actual = new LensLibrary.Step(input).hash();
 
         assertThat(actual).isEqualTo(hash);
     }
@@ -51,6 +51,24 @@ class LensLibraryTest {
         var actual = LensLibrary.sumOfHashes(input);
 
         assertThat(actual).isEqualTo(516804);
+    }
+
+    @Test
+    void focusingPowerForExample() {
+        var input = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7";
+
+        var actual = LensLibrary.calculateFocusingPower(input);
+
+        assertThat(actual).isEqualTo(145);
+    }
+
+    @Test
+    void focusingPowerForPart2() {
+        var input = TestHelper.readInput("/day15-initialization-steps.txt").trim();
+
+        var actual = LensLibrary.calculateFocusingPower(input);
+
+        assertThat(actual).isEqualTo(231844);
     }
 
 }
