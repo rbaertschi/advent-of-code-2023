@@ -34,9 +34,10 @@ public record FloorWillBeLava(List<List<Tile>> tiles) {
         return tiles.get(position.row()).get(position.column());
     }
 
-    public long countEnergizedTiles() {
+    public long countEnergizedTiles(Position initialPosition, Direction initialDirection) {
+        reset();
         Queue<PositionAndDirection> positionsToVisit = new ArrayDeque<>();
-        positionsToVisit.add(new PositionAndDirection(new Position(0,0), RIGHT));
+        positionsToVisit.add(new PositionAndDirection(initialPosition, initialDirection));
         while (!positionsToVisit.isEmpty()) {
             var positionAndDirection = positionsToVisit.poll();
             var position = positionAndDirection.position();
@@ -51,11 +52,43 @@ public record FloorWillBeLava(List<List<Tile>> tiles) {
         return tiles().stream().mapToLong(tile -> tile.stream().filter(Tile::isVisited).count()).sum();
     }
 
+    private void reset() {
+        tiles().forEach(line -> line.forEach(Tile::reset));
+    }
+
+    public long getMaxEnergizedTiles() {
+        int rows = tiles().size();
+        int columns = tiles().getFirst().size();
+        long maxEnergized = 0;
+        for (int row = 0; row < rows; row++) {
+            long energizedTiles = countEnergizedTiles(new Position(row, 0), RIGHT);
+            if (energizedTiles > maxEnergized) {
+                maxEnergized = energizedTiles;
+            }
+            energizedTiles = countEnergizedTiles(new Position(row, columns - 1), LEFT);
+            if (energizedTiles > maxEnergized) {
+                maxEnergized = energizedTiles;
+            }
+        }
+        for (int column = 0; column < columns; column++) {
+            long energizedTiles = countEnergizedTiles(new Position(0, column), DOWN);
+            if (energizedTiles > maxEnergized) {
+                maxEnergized = energizedTiles;
+            }
+            energizedTiles = countEnergizedTiles(new Position(rows - 1, column), UP);
+            if (energizedTiles > maxEnergized) {
+                maxEnergized = energizedTiles;
+            }
+        }
+        return maxEnergized;
+    }
+
     public enum Direction {
         UP, LEFT, DOWN, RIGHT;
     }
 
-    record PositionAndDirection(Position position, Direction direction){}
+    record PositionAndDirection(Position position, Direction direction) {
+    }
 
     public record Position(int row, int column) {
         public Position move(Direction towards) {
@@ -70,7 +103,10 @@ public record FloorWillBeLava(List<List<Tile>> tiles) {
 
     interface Tile {
         List<Direction> outgoingFrom(Direction incomming);
+
         boolean isVisited();
+
+        void reset();
     }
 
     static class EmptyTile implements Tile {
@@ -99,6 +135,12 @@ public record FloorWillBeLava(List<List<Tile>> tiles) {
 
         public boolean isVisited() {
             return isVisited;
+        }
+
+        @Override
+        public void reset() {
+            isVisited = false;
+            visitedDirections.clear();
         }
 
         @Override

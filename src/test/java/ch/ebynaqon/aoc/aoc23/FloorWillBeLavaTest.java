@@ -58,17 +58,46 @@ class FloorWillBeLavaTest {
                 ..//.|....
                 """.trim();
 
-        var actual = FloorWillBeLava.parse(input).countEnergizedTiles();
+        var actual = FloorWillBeLava.parse(input).countEnergizedTiles(new Position(0, 0), RIGHT);
 
         assertThat(actual).isEqualTo(46);
+    }
+
+    @Test
+    void getMaxEnergizedTilesForExample() {
+        var input = """
+                .|...\\....
+                |.-.\\.....
+                .....|-...
+                ........|.
+                ..........
+                .........\\
+                ..../.\\\\..
+                .-.-/..|..
+                .|....-|.\\
+                ..//.|....
+                """.trim();
+
+        var actual = FloorWillBeLava.parse(input).getMaxEnergizedTiles();
+
+        assertThat(actual).isEqualTo(51);
     }
 
     @Test
     void countEnergizedTilesForPart1() {
         var input = TestHelper.readInput("/day16-laser-grid.txt").trim();
 
-        var actual = FloorWillBeLava.parse(input).countEnergizedTiles();
+        var actual = FloorWillBeLava.parse(input).countEnergizedTiles(new Position(0, 0), RIGHT);
 
         assertThat(actual).isEqualTo(7951);
+    }
+
+    @Test
+    void getMaxEnergizedTilesForPart2() {
+        var input = TestHelper.readInput("/day16-laser-grid.txt").trim();
+
+        var actual = FloorWillBeLava.parse(input).getMaxEnergizedTiles();
+
+        assertThat(actual).isEqualTo(8148);
     }
 }
