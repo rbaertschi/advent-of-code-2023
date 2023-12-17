@@ -1,15 +1,16 @@
 package ch.ebynaqon.aoc.aoc23;
 
-import ch.ebynaqon.aoc.aoc23.helper.CollectionHelper;
-
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ClumsyCrucible {
 
     private final int rows;
     private final List<List<Integer>> heatLoss;
-    private final List<List<Integer>> leastHeatLoss;
+    private final List<List<Integer>> leastHeatLossVertical;
+    private final List<List<Integer>> leastHeatLossHorizontal;
     private final int cols;
 
     public ClumsyCrucible(String input) {
@@ -21,109 +22,77 @@ public class ClumsyCrucible {
                 .toList();
         rows = heatLoss.size();
         cols = heatLoss.getFirst().size();
-        leastHeatLoss = new ArrayList<>(rows);
+        leastHeatLossVertical = new ArrayList<>(rows);
+        leastHeatLossHorizontal = new ArrayList<>(rows);
         for (int row = 0; row < rows; row++) {
-            List<Integer> rowData = new ArrayList<>(cols);
+            List<Integer> rowDataVertical = new ArrayList<>(cols);
+            List<Integer> rowDataHorizontal = new ArrayList<>(cols);
             for (int column = 0; column < cols; column++) {
-                rowData.add(Integer.MAX_VALUE / 2);
+                rowDataVertical.add(Integer.MAX_VALUE / 2);
+                rowDataHorizontal.add(Integer.MAX_VALUE / 2);
             }
-            leastHeatLoss.add(rowData);
+            leastHeatLossVertical.add(rowDataVertical);
+            leastHeatLossHorizontal.add(rowDataHorizontal);
         }
     }
 
     public int heatLossAt(Position position) {
-        return heatLoss.get(position.row()).get(position.column());
+        return heatLossAt(position.row(), position.column());
     }
 
-    public int leastHeatLossAt(Position position) {
-        return leastHeatLoss.get(position.row()).get(position.column());
+    private Integer heatLossAt(int row, int column) {
+        return heatLoss.get(row).get(column);
     }
 
-    public int setLeastHeatLossAt(Position position, int heatLoss) {
-        return leastHeatLoss.get(position.row()).set(position.column(), heatLoss);
-    }
-
-    public int leastHeatlossPath() {
-        return leastHeatlossPath(new Position(0,0), new Position(rows - 1, cols - 1));
-    }
-
-    public int leastHeatlossPath(Position start, Position end) {
-        PriorityQueue<Path> paths = new PriorityQueue<>(Comparator.comparing(Path::predictedHeatLoss));
-        var curPath = new Path(List.of(start), 0, end.distance(start));
-        while (!end.equals(curPath.positions().getLast())) {
-            List<Position> previousPositions = curPath.positions();
-            int accumulatedHeatLoss = curPath.accumulatedHeatLoss();
-            for (Position nextPosition : nextPositions(previousPositions, rows, cols)) {
-                int nextHeatLoss = accumulatedHeatLoss + heatLossAt(nextPosition);
-                if (nextHeatLoss <= leastHeatLossAt(nextPosition) + 18) {
-                    if (nextHeatLoss < leastHeatLossAt(nextPosition)) {
-                        setLeastHeatLossAt(nextPosition, nextHeatLoss);
-                    }
-                    Path path = new Path(
-                            CollectionHelper.append(previousPositions, nextPosition),
-                            nextHeatLoss,
-                            nextHeatLoss + end.distance(nextPosition)
-                    );
-                    paths.add(path);
+    public int leastHeatLoss(int minMove, int maxMove) {
+        Position start = new Position(0, 0);
+        leastHeatLossHorizontal.get(start.row()).set(start.column(), 0);
+        leastHeatLossVertical.get(start.row()).set(start.column(), 0);
+        Position end = new Position(rows - 1, cols - 1);
+        var candidates = new ArrayDeque<Position>();
+        var nextPosition = start;
+        while (nextPosition != null) {
+            int row = nextPosition.row();
+            int col = nextPosition.column();
+            int nextHeatLoss = leastHeatLossHorizontal.get(row).get(col);
+            for (int nextRow = row + 1; nextRow <= Math.min(row + maxMove, rows - 1); nextRow++) {
+                nextHeatLoss += heatLoss.get(nextRow).get(col);
+                if (nextRow >= row + minMove && nextHeatLoss < leastHeatLossVertical.get(nextRow).get(col)) {
+                    candidates.add(new Position(nextRow, col));
+                    leastHeatLossVertical.get(nextRow).set(col, nextHeatLoss);
                 }
             }
-            curPath = paths.poll();
-            if (curPath == null) break;
-        }
-        return curPath.accumulatedHeatLoss();
-    }
-
-    public static List<Position> nextPositions(List<Position> positions, int rows, int cols) {
-        Position lastPosition = positions.getLast();
-        return Stream.of(
-                        new Position(lastPosition.row() + 1, lastPosition.column()),
-                        new Position(lastPosition.row() - 1, lastPosition.column()),
-                        new Position(lastPosition.row(), lastPosition.column() + 1),
-                        new Position(lastPosition.row(), lastPosition.column() - 1)
-                )
-                .filter(position -> isValidPath(positions, position, rows, cols))
-                .toList();
-    }
-
-    private static boolean isValidPath(List<Position> path, Position last, int rows, int cols) {
-        if (last.row() < 0 || last.row() > rows - 1
-            || last.column() < 0 || last.column() > cols - 1) {
-            // out of bounds
-            return false;
-        }
-        if (path.size() >= 2 && last.equals(path.get(path.size() - 2))) {
-            // hard turn
-            return false;
-        }
-        if (path.stream().anyMatch(prevPos -> prevPos.equals(last))) {
-            // return to previous point
-            return false;
-        }
-        if (path.size() >= 4) {
-            var lastPositions = List.of(
-                    path.get(path.size() - 4),
-                    path.get(path.size() - 3),
-                    path.get(path.size() - 2),
-                    path.get(path.size() - 1)
-            );
-            if (lastPositions.stream().map(Position::column).allMatch(column -> column == last.column())) {
-                // more than 3 steps in same column
-                return false;
+            nextHeatLoss = leastHeatLossHorizontal.get(row).get(col);
+            for (int nextRow = row - 1; nextRow >= Math.max(row - maxMove, 0); nextRow--) {
+                nextHeatLoss += heatLoss.get(nextRow).get(col);
+                if (nextRow <= row - minMove && nextHeatLoss < leastHeatLossVertical.get(nextRow).get(col)) {
+                    candidates.add(new Position(nextRow, col));
+                    leastHeatLossVertical.get(nextRow).set(col, nextHeatLoss);
+                }
             }
-            if (lastPositions.stream().map(Position::row).allMatch(row -> row == last.row())) {
-                // more than 3 steps in same row
-                return false;
+            nextHeatLoss = leastHeatLossVertical.get(row).get(col);
+            for (int nextCol = col + 1; nextCol <= Math.min(col + maxMove, cols - 1); nextCol++) {
+                nextHeatLoss += heatLoss.get(row).get(nextCol);
+                if (nextCol >= col + minMove && nextHeatLoss < leastHeatLossHorizontal.get(row).get(nextCol)) {
+                    candidates.add(new Position(row, nextCol));
+                    leastHeatLossHorizontal.get(row).set(nextCol, nextHeatLoss);
+                }
             }
+            nextHeatLoss = leastHeatLossVertical.get(row).get(col);
+            for (int nextCol = col - 1; nextCol >= Math.max(col - maxMove, 0); nextCol--) {
+                nextHeatLoss += heatLoss.get(row).get(nextCol);
+                if (nextCol <= col - minMove && nextHeatLoss < leastHeatLossHorizontal.get(row).get(nextCol)) {
+                    candidates.add(new Position(row, nextCol));
+                    leastHeatLossHorizontal.get(row).set(nextCol, nextHeatLoss);
+                }
+            }
+            nextPosition = candidates.poll();
         }
-        return true;
+        return Math.min(leastHeatLossHorizontal.get(end.row()).get(end.column()),
+                leastHeatLossVertical.get(end.row()).get(end.column()));
     }
 
     public record Position(int row, int column) {
-        public int distance(Position other) {
-            return Math.abs(other.row() - row()) + Math.abs(other.column() - column());
-        }
     }
 
-    public record Path(List<Position> positions, int accumulatedHeatLoss, int predictedHeatLoss) {
-    }
 }
