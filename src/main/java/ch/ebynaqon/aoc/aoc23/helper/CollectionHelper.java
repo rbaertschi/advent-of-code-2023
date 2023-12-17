@@ -1,5 +1,7 @@
 package ch.ebynaqon.aoc.aoc23.helper;
 
+import ch.ebynaqon.aoc.aoc23.ClumsyCrucible;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,12 @@ public class CollectionHelper {
         ArrayList<T> combined = new ArrayList<>(a);
         combined.addAll(b);
         return combined;
+    }
+
+    public static <T> List<T> append(List<T> list, T next) {
+        var result = new ArrayList<>(list);
+        result.add(next);
+        return result;
     }
 
     public record IndexAndValue<T>(int index, T value) {}
