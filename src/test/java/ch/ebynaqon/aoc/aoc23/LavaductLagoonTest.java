@@ -143,7 +143,7 @@ class LavaductLagoonTest {
 
     @Test
     void getDigVolumeForPart1() {
-        var input = TestHelper.readInput("/day17-lavaduct-dig-plan.txt").trim();
+        var input = TestHelper.readInput("/day18-lavaduct-dig-plan.txt").trim();
 
         var actual = LavaductLagoon.parse(input).getDigVolume();
 
@@ -152,7 +152,7 @@ class LavaductLagoonTest {
 
     @Test
     void getDigVolumeForPart2() {
-        var input = TestHelper.readInput("/day17-lavaduct-dig-plan.txt").trim();
+        var input = TestHelper.readInput("/day18-lavaduct-dig-plan.txt").trim();
 
         var actual = LavaductLagoon.parseFromHex(input).getDigVolume();
 
