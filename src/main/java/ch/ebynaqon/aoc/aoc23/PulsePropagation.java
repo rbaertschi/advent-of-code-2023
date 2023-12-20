@@ -1,5 +1,7 @@
 package ch.ebynaqon.aoc.aoc23;
 
+import ch.ebynaqon.aoc.aoc23.helper.MathHelper;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,34 +28,68 @@ public record PulsePropagation(List<Module> modules) {
     }
 
     public long getPulseScoreAfter1000ButtonPresses() {
+        var modulesByName = getModulesByName();
+        long highPulses = 0;
+        long lowPulses = 0;
+        for (int buttonPresses = 0; buttonPresses < 1000; buttonPresses++) {
+            var pulsesSentInCycle = getPulsesSentInCycle(modulesByName);
+            long newLowPulses = pulsesSentInCycle.stream().filter(newPulse -> newPulse.type() == PulseType.LOW).count();
+            long newHighPulses = pulsesSentInCycle.size() - newLowPulses;
+            lowPulses += newLowPulses;
+            highPulses += newHighPulses;
+        }
+        return highPulses * lowPulses;
+    }
+
+    public long getNumberOfCyclesUntilLowPulseToRxModule() {
+        // the 'rx' module is only called by the 'vr' module which is a conjunction
+        // the 'vr' module is called by 4 other modules which send a high signal in different cycles to the 'vr' module
+        // so finding the least common multiplier of those cycles should give us the result
+        var modulesByName = getModulesByName();
+        var cycleOfModulesCallingVr = new HashMap<String, Integer>();
+        ((Conjunction) modulesByName.get("vr")).inputModuleNames().forEach(name -> cycleOfModulesCallingVr.put(name, null));
+        for (int buttonPresses = 1; buttonPresses < 10_000; buttonPresses++) {
+            var pulsesSentInCycle = getPulsesSentInCycle(modulesByName);
+            int b = buttonPresses;
+            pulsesSentInCycle.stream()
+                    .filter(pulse -> pulse.type() == PulseType.HIGH && pulse.targetModuleName().equals("vr"))
+                    .map(Pulse::sourceModuleName)
+                    .forEach(module -> {
+                        cycleOfModulesCallingVr.putIfAbsent(module, b);
+                    });
+            if (cycleOfModulesCallingVr.values().stream().noneMatch(Objects::isNull)) {
+                return MathHelper.leastCommonMultiple(cycleOfModulesCallingVr.values().stream().toList());
+            }
+        }
+        throw new IllegalStateException("Did not reach desired target state!");
+    }
+
+    private HashMap<String, Module> getModulesByName() {
         var modulesByName = new HashMap<String, Module>();
         for (var module : modules()) {
             modulesByName.put(module.name(), module);
         }
-        long highPulses = 0;
-        long lowPulses = 0;
-        for (int i = 0; i < 1000; i++) {
-            var pulses = List.of(
-                    new Pulse(PulseType.LOW, "button", "broadcaster")
-            );
-            lowPulses += 1;
-            while (!pulses.isEmpty()) {
-                var nextPulses = new ArrayList<Pulse>();
-                for (var pulse : pulses) {
-                    Module module = modulesByName.get(pulse.targetModuleName());
-                    if (module != null) {
-                        List<Pulse> newPulses = module.apply(pulse);
-                        long newLowPulses = newPulses.stream().filter(newPulse -> newPulse.type() == PulseType.LOW).count();
-                        long newHighPulses = newPulses.size() - newLowPulses;
-                        lowPulses += newLowPulses;
-                        highPulses += newHighPulses;
-                        nextPulses.addAll(newPulses);
-                    }
+        return modulesByName;
+    }
+
+    private static ArrayList<Pulse> getPulsesSentInCycle(HashMap<String, Module> modulesByName) {
+        var pulsesSentInCycle = new ArrayList<Pulse>();
+        var pulses = List.of(
+                new Pulse(PulseType.LOW, "button", "broadcaster")
+        );
+        while (!pulses.isEmpty()) {
+            pulsesSentInCycle.addAll(pulses);
+            var nextPulses = new ArrayList<Pulse>();
+            for (var pulse : pulses) {
+                Module module = modulesByName.get(pulse.targetModuleName());
+                if (module != null) {
+                    List<Pulse> newPulses = module.apply(pulse);
+                    nextPulses.addAll(newPulses);
                 }
-                pulses = nextPulses;
             }
+            pulses = nextPulses;
         }
-        return highPulses * lowPulses;
+        return pulsesSentInCycle;
     }
 
     public interface Module {
@@ -212,6 +248,10 @@ public record PulsePropagation(List<Module> modules) {
             for (var moduleName : inputModuleNames) {
                 lastPulseTypeFromModule.put(moduleName, PulseType.LOW);
             }
+        }
+
+        private List<String> inputModuleNames() {
+            return lastPulseTypeFromModule.keySet().stream().toList();
         }
     }
 

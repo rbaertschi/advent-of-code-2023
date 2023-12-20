@@ -120,4 +120,13 @@ class PulsePropagationTest {
         assertThat(actual).isEqualTo(712543680);
     }
 
+    @Test
+    void getNumberOfCyclesUntilLowPulseToRxModuleForPart2() {
+        var input = TestHelper.readInput("/day20-pulse-propagation.txt").trim();
+
+        var actual = PulsePropagation.parse(input).getNumberOfCyclesUntilLowPulseToRxModule();
+
+        assertThat(actual).isEqualTo(238920142622879L);
+    }
+
 }
