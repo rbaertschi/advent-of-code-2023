@@ -1,5 +1,7 @@
 package ch.ebynaqon.aoc.aoc23;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -8,17 +10,22 @@ public class ScenicHike {
     private final String[] lines;
     private final int rows;
     private final int columns;
+    private final boolean considerSlopes;
 
-    public ScenicHike(String input) {
+    public ScenicHike(String input, boolean considerSlopes) {
         lines = input.split("\n");
         rows = lines.length;
         columns = lines[0].length();
+        this.considerSlopes = considerSlopes;
     }
 
-    private int findLongestPath(Position start, Position end, HashSet<Position> visitedWaypoints) {
+    private HashSet<Segment> findSegments(Position lastWaypoint, Position start, Position end, HashSet<Position> visitedWaypoints) {
         var currentPosition = start;
         int numberOfSteps = 0;
-        var visitedPositions = new HashSet<>();
+        var visitedPositions = new HashSet<Position>();
+        visitedPositions.add(lastWaypoint);
+        boolean isForward = canMove(lastWaypoint, currentPosition);
+        boolean isBackward = canMove(currentPosition, lastWaypoint);
         while (!currentPosition.equals(end)) {
             visitedPositions.add(currentPosition);
             numberOfSteps++;
@@ -27,26 +34,67 @@ public class ScenicHike {
                     .filter(this::isInside)
                     .filter(point -> symbolAtPosition(point) != '#')
                     .filter(point -> !visitedPositions.contains(point))
-                    .filter(point -> !visitedWaypoints.contains(point))
                     .toList();
             if (neighbours.size() > 1) {
+                var segments = new HashSet<Segment>();
+
                 var currentWaypoint = currentPosition;
-                return neighbours.stream()
-                               .filter(neighbour -> this.canMove(currentWaypoint, neighbour))
-                               .mapToInt(neighbour -> {
-                                   var visitedWaypointsWithCurrent = new HashSet<>(visitedWaypoints);
-                                   visitedWaypointsWithCurrent.add(currentWaypoint);
-                                   return findLongestPath(neighbour, end, visitedWaypointsWithCurrent);
-                               })
-                               .max()
-                               .getAsInt() + numberOfSteps;
+                if (!considerSlopes || isForward) {
+                    segments.add(new Segment(lastWaypoint, currentWaypoint, numberOfSteps, visitedPositions));
+                }
+                if (!considerSlopes || isBackward) {
+                    segments.add(new Segment(currentWaypoint, lastWaypoint, numberOfSteps, visitedPositions));
+                }
+                if (!visitedWaypoints.contains(currentWaypoint)) {
+                    visitedWaypoints.add(currentWaypoint);
+                    segments.addAll(neighbours.stream()
+                            .flatMap(neighbour ->
+                                    findSegments(currentWaypoint, neighbour, end, visitedWaypoints).stream()
+                            )
+                            .toList());
+                }
+                return segments;
             } else if (neighbours.size() == 1) {
-                currentPosition = neighbours.getFirst();
+                var nextPosition = neighbours.getFirst();
+                isForward &= canMove(currentPosition, nextPosition);
+                isBackward &= canMove(nextPosition, currentPosition);
+                currentPosition = nextPosition;
             } else {
-                return 0;
+                return new HashSet<>();
             }
         }
-        return numberOfSteps;
+        visitedPositions.add(end);
+        return new HashSet<>(List.of(new Segment(lastWaypoint, end, numberOfSteps, visitedPositions)));
+    }
+
+    public int findLongestPath() {
+        Position start = findStartingPosition();
+        Position end = findEndPosition();
+        var segments = findSegments(start, start, end, new HashSet<>());
+        var segmentsByPosition = new HashMap<Position, List<Segment>>();
+        for (var segment : segments) {
+            segmentsByPosition.putIfAbsent(segment.start(), new ArrayList<>());
+            segmentsByPosition.get(segment.start()).add(segment);
+        }
+        return findLongestPath(start, end, segmentsByPosition, new ArrayList<>());
+    }
+
+    private int findLongestPath(Position start, Position end, HashMap<Position, List<Segment>> segments, List<Position> visited) {
+        int longestPath = -1;
+        var nextVisited = new ArrayList<>(visited);
+        nextVisited.add(start);
+        for (var segment : segments.get(start)) {
+            if (!visited.contains(segment.end())) {
+                if (segment.end().equals(end)) {
+                    return segment.length();
+                }
+                int longestPathAfterSegment = findLongestPath(segment.end(), end, segments, nextVisited);
+                if (longestPathAfterSegment > -1) {
+                    longestPath = Math.max(longestPath, longestPathAfterSegment + segment.length());
+                }
+            }
+        }
+        return longestPath;
     }
 
     private boolean canMove(Position from, Position to) {
@@ -61,13 +109,26 @@ public class ScenicHike {
         };
     }
 
+    private char symbolAtPosition(int row, int column) {
+        return lines[row].charAt(column);
+    }
+
+    private char symbolAtPosition(Position position) {
+        return symbolAtPosition(position.row(), position.column());
+    }
+
     private boolean isInside(Position position) {
         return position.row() >= 0 && position.column() >= 0
                && position.row() < rows && position.column() < columns;
     }
 
-    public int findLongestPath() {
-        return findLongestPath(findStartingPosition(), findEndPosition(), new HashSet<>());
+    private Position findStartingPosition() {
+        for (int column = 0; column < columns; column++) {
+            if (symbolAtPosition(0, column) == '.') {
+                return new Position(0, column);
+            }
+        }
+        throw new IllegalStateException("Could not find start position!");
     }
 
     private Position findEndPosition() {
@@ -79,16 +140,7 @@ public class ScenicHike {
         throw new IllegalStateException("Could not find end position!");
     }
 
-    private char symbolAtPosition(int row, int column) {
-        return lines[row].charAt(column);
-    }
-
-    private char symbolAtPosition(Position position) {
-        return symbolAtPosition(position.row(), position.column());
-    }
-
-    private Position findStartingPosition() {
-        return new Position(0, 1);
+    public record Segment(Position start, Position end, int length, HashSet<Position> visitedPositions) {
     }
 
     public record Position(int row, int column) {
