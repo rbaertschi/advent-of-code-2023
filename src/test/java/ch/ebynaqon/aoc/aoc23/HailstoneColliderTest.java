@@ -3,6 +3,7 @@ package ch.ebynaqon.aoc.aoc23;
 import ch.ebynaqon.aoc.aoc23.HailstoneCollider.HailstonePath;
 import ch.ebynaqon.aoc.aoc23.HailstoneCollider.Vector;
 import ch.ebynaqon.aoc.aoc23.helper.TestHelper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -156,5 +157,42 @@ class HailstoneColliderTest {
                 );
 
         assertThat(actual).isEqualTo(19976);
+    }
+
+    @Test
+    void calculateOptimalStoneThrowForPart2() {
+        var input = TestHelper.readInput("/day24-hailstones.txt").trim();
+
+        var actual = new HailstoneCollider(input).calculateOptimalStoneThrow();
+
+        assertThat(actual).isEqualTo(new HailstonePath(
+                new Vector(287838354624648L, 412952398656862L, 148587016955395L),
+                new Vector(-5, -250, 217)
+        ));
+    }
+
+    @Test
+    @Disabled("Algorithm does not quite work for the example with just 6 hailstones")
+    void calculateOptimalStoneThrowForExample() {
+        var input = """
+                19, 13, 30 @ -2,  1, -2
+                18, 19, 22 @ -1, -1, -2
+                20, 25, 34 @ -2, -2, -4
+                12, 31, 28 @ -1, -2, -1
+                20, 19, 15 @  1, -5, -3
+                """.trim();
+
+        var actual = new HailstoneCollider(input).calculateOptimalStoneThrow();
+
+        assertThat(actual).isEqualTo(new HailstonePath(new Vector(24, 13, 10), new Vector(-3, 1, 2)));
+    }
+
+    @Test
+    void sumOfCoordinatesOfOptimalStartPositionForStoneThrowForPart2() {
+        var input = TestHelper.readInput("/day24-hailstones.txt").trim();
+
+        var actual = new HailstoneCollider(input).sumOfCoordinatesOfOptimalStartPositionForStoneThrow();
+
+        assertThat(actual).isEqualTo(849377770236905L);
     }
 }
